@@ -59,7 +59,7 @@ public class ClockView extends ViewPart {
 		final Runnable runClock = () ->{
 			while (!clock.isDisposed()) {
 				try {
-					clock.dispose();
+					clock.redraw();
 				}catch (Exception e) {
 					throw new RuntimeException(e);
 				}
