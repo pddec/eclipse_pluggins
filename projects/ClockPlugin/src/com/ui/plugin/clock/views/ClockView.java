@@ -1,10 +1,16 @@
 package com.ui.plugin.clock.views;
 
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.widgets.Canvas;
+import org.eclipse.swt.layout.RowData;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
+
+import com.ui.plugin.clock.widget.ClockWidget;
 
 /**
  * This sample class demonstrates how to plug-in a new workbench view. The view
@@ -30,12 +36,32 @@ public class ClockView extends ViewPart {
 
 	@Override
 	public void createPartControl(final Composite parent) {
-		final Canvas clock = new Canvas(parent, SWT.NONE);
-		clock.addPaintListener(this::drawClock);
-	}
+		
+		RowLayout layout = new RowLayout(SWT.HORIZONTAL);
+		parent.setLayout(layout);
+ 
+		final ClockWidget clockWidget1 = ClockWidget.builder().parent(parent).style(SWT.NONE).build();
+		final ClockWidget clockWidget2 = ClockWidget.builder().parent(parent).style(SWT.NONE).build();
+		final ClockWidget clockWidget3 = ClockWidget.builder().parent(parent).style(SWT.NONE).build();
+		
+		clockWidget1.setLayoutData(new RowData(20,20));
+		clockWidget2.setLayoutData(new RowData(50,50));
+		clockWidget3.setLayoutData(new RowData(100,100));
 
-	private void drawClock(final PaintEvent event) {
-		event.gc.drawArc(event.x, event.y, event.width - 1, event.height - 1, 0, 360);
+		clockWidget1.initPaintListener();
+		clockWidget2.initPaintListener();
+		clockWidget3.initPaintListener();
+		
+		final Thread runnerClock1 = clockWidget1.moveSecondHand();
+		final Thread runnerClock2 = clockWidget1.moveSecondHand();
+		final Thread runnerClock3 = clockWidget1.moveSecondHand();
+		
+		final ExecutorService services = Executors.newFixedThreadPool(3);
+		
+		services.submit(runnerClock1);
+		services.submit(runnerClock2);
+		services.submit(runnerClock3);
+
 	}
 
 	@Override
