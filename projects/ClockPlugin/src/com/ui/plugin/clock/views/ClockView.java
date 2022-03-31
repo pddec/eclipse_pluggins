@@ -1,5 +1,9 @@
 package com.ui.plugin.clock.views;
 
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
@@ -30,15 +34,25 @@ public class ClockView extends ViewPart {
 
 	@Override
 	public void createPartControl(final Composite parent) {
+
+		final ClockWidget clockWidget1 = ClockWidget.builder().parent(parent).style(SWT.NONE).build();
+		final ClockWidget clockWidget2 = ClockWidget.builder().parent(parent).style(SWT.NONE).build();
+		final ClockWidget clockWidget3 = ClockWidget.builder().parent(parent).style(SWT.NONE).build();
+
+		clockWidget1.initPaintListener();
+		clockWidget2.initPaintListener();
+		clockWidget3.initPaintListener();
 		
-		final ClockWidget clockWidget = ClockWidget.builder()
-		.parent(parent)
-		.style(SWT.NONE)
-		.build();
+		final Thread runnerClock1 = clockWidget1.moveSecondHand();
+		final Thread runnerClock2 = clockWidget1.moveSecondHand();
+		final Thread runnerClock3 = clockWidget1.moveSecondHand();
 		
-		clockWidget.initPaintListener();
-		clockWidget.moveSecondHand().start();
+		final ExecutorService services = Executors.newFixedThreadPool(3);
 		
+		services.submit(runnerClock1);
+		services.submit(runnerClock2);
+		services.submit(runnerClock3);
+
 	}
 
 	@Override
