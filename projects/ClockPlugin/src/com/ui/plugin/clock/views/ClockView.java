@@ -59,7 +59,9 @@ public class ClockView extends ViewPart {
 		final Runnable runClock = () ->{
 			while (!clock.isDisposed()) {
 				try {
-					clock.redraw();
+					//clock.redraw();
+					clock.getDisplay().asyncExec(() -> clock.redraw());
+					Thread.sleep(10000);
 				}catch (Exception e) {
 					throw new RuntimeException(e);
 				}
