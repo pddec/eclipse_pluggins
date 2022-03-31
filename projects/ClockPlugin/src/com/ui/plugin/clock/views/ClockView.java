@@ -5,6 +5,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
 
@@ -34,7 +35,10 @@ public class ClockView extends ViewPart {
 
 	@Override
 	public void createPartControl(final Composite parent) {
-
+		
+		RowLayout layout = new RowLayout(SWT.HORIZONTAL);
+		parent.setLayout(layout);
+ 
 		final ClockWidget clockWidget1 = ClockWidget.builder().parent(parent).style(SWT.NONE).build();
 		final ClockWidget clockWidget2 = ClockWidget.builder().parent(parent).style(SWT.NONE).build();
 		final ClockWidget clockWidget3 = ClockWidget.builder().parent(parent).style(SWT.NONE).build();
