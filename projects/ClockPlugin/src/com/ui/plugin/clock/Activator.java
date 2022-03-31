@@ -1,4 +1,4 @@
-package com.ui.clock.pluggin;
+package com.ui.plugin.clock;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;

@@ -1,4 +1,4 @@
-package com.ui.clock.pluggin.views;
+package com.ui.plugin.clock.views;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
@@ -26,16 +26,13 @@ public class ClockView extends ViewPart {
 	/**
 	 * The ID of the view as specified by the extension.
 	 */
-	public static final String ID = "com.ui.clock.pluggin.views.ClockView";
+	public static final String ID = "com.ui.plugin.clock.views.ClockView";
 
 	@Override
 	public void createPartControl(final Composite parent) {
-
 		final Canvas clock = new Canvas(parent, SWT.NONE);
 		clock.addPaintListener(this::drawClock);
-
 	}
-
 
 	private void drawClock(final PaintEvent event) {
 		event.gc.drawArc(event.x, event.y, event.width - 1, event.height - 1, 0, 360);
@@ -43,6 +40,5 @@ public class ClockView extends ViewPart {
 
 	@Override
 	public void setFocus() {
-
 	}
 }

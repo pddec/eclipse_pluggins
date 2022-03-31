@@ -3,8 +3,8 @@ Bundle-ManifestVersion: 2
 Bundle-Name: ClockPlugin
 Bundle-SymbolicName: ClockPlugin;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: com.ui.clock.pluggin.Activator
-Bundle-Vendor: com.ui.clock.pluggin
+Bundle-Activator: com.ui.plugin.clock.Activator
+Bundle-Vendor: com.ui.plugin.clock
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime
 Bundle-RequiredExecutionEnvironment: JavaSE-11

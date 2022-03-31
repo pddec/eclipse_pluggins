@@ -9,10 +9,10 @@
             id="ClockPlugin">
       </category>
       <view
-            id="com.ui.clock.pluggin.views.ClockView"
+            id="com.ui.plugin.clock.views.ClockView"
             name="Clock View"
             icon="icons/sample.png"
-            class="com.ui.clock.pluggin.views.ClockView"
+            class="com.ui.plugin.clock.views.ClockView"
             category="ClockPlugin"
             inject="true">
       </view>
@@ -22,7 +22,7 @@
       <perspectiveExtension
             targetID="org.eclipse.jdt.ui.JavaPerspective">
          <view
-               id="com.ui.clock.pluggin.views.ClockView"
+               id="com.ui.plugin.clock.views.ClockView"
                relative="org.eclipse.ui.views.ProblemView"
                relationship="right"
                ratio="0.5">
