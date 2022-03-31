@@ -1,7 +1,10 @@
 package com.ui.plugin.clock.views;
 
+import java.time.LocalTime;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
@@ -32,10 +35,20 @@ public class ClockView extends ViewPart {
 	public void createPartControl(final Composite parent) {
 		final Canvas clock = new Canvas(parent, SWT.NONE);
 		clock.addPaintListener(this::drawClock);
+		clock.addPaintListener(this::paintControl);
 	}
 
 	private void drawClock(final PaintEvent event) {
 		event.gc.drawArc(event.x, event.y, event.width - 1, event.height - 1, 0, 360);
+	}
+
+	public void paintControl(final PaintEvent event) {
+		event.gc.drawArc(event.x, event.y, event.width - 1, event.height - 1, 0, 360);
+		final int seconds = LocalTime.now().getSecond();
+		final int arc = (15 - seconds) * 6 % 360;
+		final Color blue = event.display.getSystemColor(SWT.COLOR_BLUE);
+		event.gc.setBackground(blue);
+		event.gc.fillArc(event.x, event.y, event.width - 1, event.height - 1, arc - 1, 2);
 	}
 
 	@Override
