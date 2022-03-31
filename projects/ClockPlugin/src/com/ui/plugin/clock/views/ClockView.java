@@ -36,6 +36,9 @@ public class ClockView extends ViewPart {
 		final Canvas clock = new Canvas(parent, SWT.NONE);
 		clock.addPaintListener(this::drawClock);
 		clock.addPaintListener(this::paintControl);
+		
+		ClockView.moveSecondHand(clock).start();
+		
 	}
 
 	private void drawClock(final PaintEvent event) {
@@ -49,6 +52,27 @@ public class ClockView extends ViewPart {
 		final Color blue = event.display.getSystemColor(SWT.COLOR_BLUE);
 		event.gc.setBackground(blue);
 		event.gc.fillArc(event.x, event.y, event.width - 1, event.height - 1, arc - 1, 2);
+	}
+	
+	private static Thread moveSecondHand(final Canvas clock) {
+		
+		final Runnable runClock = () ->{
+			while (!clock.isDisposed()) {
+				try {
+					clock.dispose();
+				}catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			}
+		};
+		
+		final Thread runner = new Thread(runClock,"Tick Tack");
+		runner.setUncaughtExceptionHandler((thread, exception) -> {
+			exception.printStackTrace();
+		});
+		
+		return runner;
+		
 	}
 
 	@Override
