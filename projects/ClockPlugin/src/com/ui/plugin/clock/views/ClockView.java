@@ -61,7 +61,7 @@ public class ClockView extends ViewPart {
 				try {
 					//clock.redraw();
 					clock.getDisplay().asyncExec(() -> clock.redraw());
-					Thread.sleep(10000);
+					Thread.sleep(1000);
 				}catch (Exception e) {
 					throw new RuntimeException(e);
 				}
