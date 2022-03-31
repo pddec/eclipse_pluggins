@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: ClockPlugin
+Bundle-SymbolicName: ClockPlugin;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: com.ui.clock.pluggin.Activator
+Bundle-Vendor: com.ui.clock.pluggin
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime
+Bundle-RequiredExecutionEnvironment: JavaSE-11
+Automatic-Module-Name: ClockPlugin
+Import-Package: javax.inject
+Bundle-ActivationPolicy: lazy

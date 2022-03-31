@@ -1,0 +1,17 @@
+
+projects/ClockPlugin/.classpath
+
+projects/ClockPlugin/.settings
+
+projects/ClockPlugin/.project
+projects/ClockPlugin/.gitignore
+
+projects/ClockPlugin/bin
+projects/ClockPlugin/bin/*
+
+workspace
+workspace/*
+
+runtime-EclipseApplication
+runtime-EclipseApplication/*
+
