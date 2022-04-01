@@ -51,7 +51,7 @@ public class ClockWidget extends Canvas {
 	
 	public void paintHoursHand(final PaintEvent event) {
 		event.gc.setBackground(event.display.getSystemColor(SWT.COLOR_BLACK));
-		final ZonedDateTime now = ZonedDateTime.now(zone);
+		final ZonedDateTime now = ZonedDateTime.now(this.zone);
 		
 		final int hours = now.getHour();
 		final int arc = (3 - hours) * 30 % 360;
