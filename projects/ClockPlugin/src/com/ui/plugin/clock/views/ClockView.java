@@ -1,9 +1,10 @@
 package com.ui.plugin.clock.views;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.Arrays;
+import java.util.function.Predicate;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
@@ -63,6 +64,14 @@ public class ClockView extends ViewPart {
 		clockWidget1.initPaintListener();
 		clockWidget2.initPaintListener();
 		clockWidget3.initPaintListener();
+		
+		Object[] objects = parent.getDisplay().getDeviceData().objects;
+		
+		final Predicate<Object> predicate = object -> object instanceof Color;
+		
+		final Long count = Arrays.stream(objects).filter(predicate).count();
+		
+		System.err.println("There are " + count + " Color instances");
 		
 		/*
 		 * final Thread runnerClock1 = clockWidget1.moveSecondHand(); final Thread
