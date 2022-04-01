@@ -1,6 +1,5 @@
 package com.ui.plugin.clock.views;
 
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
