@@ -98,9 +98,8 @@ public class ClockWidget extends Canvas {
 	 * }
 	 */
 
-	public Thread moveSecondHand() {
-
-		final Runnable runClock = () -> {
+	public Runnable moveSecondHand() {
+		return () -> {
 			while (!this.isDisposed()) {
 				try {
 					// clock.redraw();
@@ -111,14 +110,6 @@ public class ClockWidget extends Canvas {
 				}
 			}
 		};
-
-		final Thread runner = new Thread(runClock, "Tick Tack");
-		runner.setUncaughtExceptionHandler((thread, exception) -> {
-			exception.printStackTrace();
-		});
-
-		return runner;
-
 	}
 	
 	public static ClockWidgetBuilder builder() {
