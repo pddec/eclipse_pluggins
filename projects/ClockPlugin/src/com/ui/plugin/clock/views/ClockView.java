@@ -1,12 +1,13 @@
 package com.ui.plugin.clock.views;
-
 import java.util.Arrays;
 import java.util.function.Predicate;
+
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.DeviceData;
 import org.eclipse.swt.graphics.RGB;
+
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -57,6 +58,7 @@ public class ClockView extends ViewPart {
 				.color(new RGB(0,0,255))
 				.style(SWT.NONE)
 				.build();
+
 		
 		clockWidget1.initDisposeListener();
 		clockWidget2.initDisposeListener();
@@ -89,6 +91,7 @@ public class ClockView extends ViewPart {
 		 * services.submit(runnerClock2);
 		 * services.submit(runnerClock3);
 		 */
+
 	}
 
 	@Override

@@ -6,11 +6,14 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
+
 import org.eclipse.swt.graphics.RGB;
+
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
 public class ClockWidget extends Canvas {
+
 
 	private Color color;
 
@@ -41,6 +44,7 @@ public class ClockWidget extends Canvas {
 		event.gc.drawArc(event.x, event.y, event.width - 1, event.height - 1, 0, 360);
 		final int seconds = LocalTime.now().getSecond();
 		final int arc = (15 - seconds) * 6 % 360;
+
 		event.gc.setBackground(this.color);
 		event.gc.fillArc(event.x, event.y, event.width - 1, event.height - 1, arc - 1, 2);
 	}
@@ -106,6 +110,7 @@ public class ClockWidget extends Canvas {
 		
 		private Composite parent;
 		private int style;
+
 		private RGB rgb;
 		
 		public ClockWidgetBuilder parent(final Composite parent) {
@@ -125,6 +130,9 @@ public class ClockWidget extends Canvas {
 		
 		public ClockWidget build() {
 			return new ClockWidget(this.parent,this.style,this.rgb);
+
+		public ClockWidget build() {
+			return new ClockWidget(this.parent,this.style);
 		}
 		
 	}
