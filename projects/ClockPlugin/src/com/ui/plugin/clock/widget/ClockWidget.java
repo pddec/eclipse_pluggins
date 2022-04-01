@@ -88,6 +88,7 @@ public class ClockWidget extends Canvas {
 		
 		private Composite parent;
 		private int style;
+		private RGB rgb;
 		
 		public ClockWidgetBuilder parent(final Composite parent) {
 			this.parent = parent;
@@ -99,8 +100,13 @@ public class ClockWidget extends Canvas {
 			return this;
 		}
 		
+		public ClockWidgetBuilder color(final RGB rgb) {
+			this.rgb = rgb;
+			return this;
+		}
+		
 		public ClockWidget build() {
-			return new ClockWidget(this.parent,this.style);
+			return new ClockWidget(this.parent,this.style,this.rgb);
 		}
 		
 	}
