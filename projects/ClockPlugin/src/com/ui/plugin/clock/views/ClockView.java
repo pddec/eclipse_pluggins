@@ -1,10 +1,10 @@
 package com.ui.plugin.clock.views;
-
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
+
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -55,6 +55,7 @@ public class ClockView extends ViewPart {
 				.color(new RGB(0,0,255))
 				.style(SWT.NONE)
 				.build();
+
 		
 		clockWidget1.setLayoutData(new RowData(20,20));
 		clockWidget2.setLayoutData(new RowData(50,50));
@@ -74,6 +75,7 @@ public class ClockView extends ViewPart {
 		 * services.submit(runnerClock1); services.submit(runnerClock2);
 		 * services.submit(runnerClock3);
 		 */
+
 	}
 
 	@Override
