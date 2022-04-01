@@ -24,9 +24,14 @@ public class ClockWidget extends Canvas {
 	}
 
 	public void initPaintListener() {
-		super.addPaintListener(this::drawClock);
-		super.addPaintListener(this::paintControl);
+		this.addPaintListener(this::drawClock);
+		this.addPaintListener(this::paintControl);
 	}
+	
+	public void initDisposeListener() {
+		this.addDisposeListener(e -> this.color.dispose());
+	}
+
 
 	private void drawClock(final PaintEvent event) {
 		event.gc.drawArc(event.x, event.y, event.width - 1, event.height - 1, 0, 360);
@@ -56,6 +61,19 @@ public class ClockWidget extends Canvas {
 
 		return new Point(size, size);
 	}
+	
+	/*
+	 * @Override public void dispose() { 
+	 * if (this.hasColor() &&
+	 * !this.color.isDisposed()) 
+	 * 	this.color.dispose(); 
+	 * 	super.dispose(); 
+	 * }
+	 * 
+	 * public boolean hasColor() { 
+	 * 	return Objects.nonNull(this.color); 
+	 * }
+	 */
 
 	public Thread moveSecondHand() {
 

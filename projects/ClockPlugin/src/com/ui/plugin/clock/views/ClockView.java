@@ -5,6 +5,7 @@ import java.util.function.Predicate;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.DeviceData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
@@ -57,19 +58,23 @@ public class ClockView extends ViewPart {
 				.style(SWT.NONE)
 				.build();
 		
-		clockWidget1.setLayoutData(new RowData(20,20));
-		clockWidget2.setLayoutData(new RowData(50,50));
-		clockWidget3.setLayoutData(new RowData(100,100));
-
+		clockWidget1.initDisposeListener();
+		clockWidget2.initDisposeListener();
+		clockWidget3.initDisposeListener();
+		
 		clockWidget1.initPaintListener();
 		clockWidget2.initPaintListener();
 		clockWidget3.initPaintListener();
 		
-		Object[] objects = parent.getDisplay().getDeviceData().objects;
+		clockWidget1.setLayoutData(new RowData(20,20));
+		clockWidget2.setLayoutData(new RowData(50,50));
+		clockWidget3.setLayoutData(new RowData(100,100));
+		
+		final DeviceData data = parent.getDisplay().getDeviceData();
 		
 		final Predicate<Object> predicate = object -> object instanceof Color;
 		
-		final Long count = Arrays.stream(objects).filter(predicate).count();
+		final Long count = Arrays.stream(data.objects).filter(predicate).count();
 		
 		System.err.println("There are " + count + " Color instances");
 		
@@ -80,7 +85,8 @@ public class ClockView extends ViewPart {
 		 * 
 		 * final ExecutorService services = Executors.newFixedThreadPool(3);
 		 * 
-		 * services.submit(runnerClock1); services.submit(runnerClock2);
+		 * services.submit(runnerClock1); 
+		 * services.submit(runnerClock2);
 		 * services.submit(runnerClock3);
 		 */
 	}
