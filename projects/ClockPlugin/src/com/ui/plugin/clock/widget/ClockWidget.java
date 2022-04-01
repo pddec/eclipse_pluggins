@@ -126,6 +126,10 @@ public class ClockWidget extends Canvas {
 		public ClockWidgetBuilder color(final RGB rgb) {
 			this.rgb = rgb;
 			return this;
+    }
+        
+		public ClockWidget build() {
+			return new ClockWidget(this.parent,this.style);
 		}
 		
 		public ClockWidget build() {
