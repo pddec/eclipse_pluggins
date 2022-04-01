@@ -1,4 +1,5 @@
 package com.ui.plugin.clock.views;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.function.Predicate;
 
@@ -11,6 +12,7 @@ import org.eclipse.swt.graphics.RGB;
 
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
 
@@ -37,9 +39,18 @@ public class ClockView extends ViewPart {
 	 * The ID of the view as specified by the extension.
 	 */
 	public static final String ID = "com.ui.plugin.clock.views.ClockView";
+	
+	private Combo timeZones;
 
 	@Override
 	public void createPartControl(final Composite parent) {
+		
+		this.timeZones = new Combo(parent, SWT.DROP_DOWN);
+		
+		this.timeZones.setVisibleItemCount(5);
+		
+		ZoneId.getAvailableZoneIds()
+		.stream().forEach(this.timeZones::add);
 		
 		RowLayout layout = new RowLayout(SWT.HORIZONTAL);
 		parent.setLayout(layout);
@@ -59,15 +70,6 @@ public class ClockView extends ViewPart {
 				.color(new RGB(0,0,255))
 				.style(SWT.NONE)
 				.build();
-
-		clockWidget1.initDisposeListener();
-		clockWidget2.initDisposeListener();
-		clockWidget3.initDisposeListener();
-		
-		clockWidget1.initPaintListener();
-		clockWidget2.initPaintListener();
-		clockWidget3.initPaintListener();
-		
 
 		clockWidget1.setLayoutData(new RowData(20,20));
 		clockWidget2.setLayoutData(new RowData(50,50));
@@ -96,5 +98,6 @@ public class ClockView extends ViewPart {
 
 	@Override
 	public void setFocus() {
+		this.timeZones.setFocus();
 	}
 }

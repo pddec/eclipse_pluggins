@@ -14,16 +14,21 @@ import org.eclipse.swt.widgets.Composite;
 
 public class ClockWidget extends Canvas {
 
-
-	private Color color;
+	private final Color color;
 
 	private ClockWidget(Composite parent, int style) {
 		super(parent, style);
+		final RGB rgb = new RGB(SWT.COLOR_BLUE,SWT.COLOR_BLUE,SWT.COLOR_BLUE);
+		this.color = new Color(parent.getDisplay(), rgb);
+		this.initDisposeListener();
+		this.initPaintListener();
 	}
 	
 	private ClockWidget(Composite parent, int style,final RGB rgb) {
 		super(parent, style);
 		this.color = new Color(parent.getDisplay(),rgb);
+		this.initDisposeListener();
+		this.initPaintListener();
 	}
 
 	public void initPaintListener() {
@@ -128,10 +133,6 @@ public class ClockWidget extends Canvas {
 			return this;
     }
         
-		public ClockWidget build() {
-			return new ClockWidget(this.parent,this.style);
-		}
-		
 		public ClockWidget build() {
 			return new ClockWidget(this.parent,this.style,this.rgb);
 		}	
