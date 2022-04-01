@@ -64,16 +64,16 @@ public class ClockView extends ViewPart {
 		clockWidget2.initPaintListener();
 		clockWidget3.initPaintListener();
 		
-		final Thread runnerClock1 = clockWidget1.moveSecondHand();
-		final Thread runnerClock2 = clockWidget1.moveSecondHand();
-		final Thread runnerClock3 = clockWidget1.moveSecondHand();
-		
-		final ExecutorService services = Executors.newFixedThreadPool(3);
-		
-		services.submit(runnerClock1);
-		services.submit(runnerClock2);
-		services.submit(runnerClock3);
-
+		/*
+		 * final Thread runnerClock1 = clockWidget1.moveSecondHand(); final Thread
+		 * runnerClock2 = clockWidget1.moveSecondHand(); final Thread runnerClock3 =
+		 * clockWidget1.moveSecondHand();
+		 * 
+		 * final ExecutorService services = Executors.newFixedThreadPool(3);
+		 * 
+		 * services.submit(runnerClock1); services.submit(runnerClock2);
+		 * services.submit(runnerClock3);
+		 */
 	}
 
 	@Override
