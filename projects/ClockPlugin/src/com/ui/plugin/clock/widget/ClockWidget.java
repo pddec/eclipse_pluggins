@@ -127,11 +127,7 @@ public class ClockWidget extends Canvas {
 			this.rgb = rgb;
 			return this;
     }
-        
-		public ClockWidget build() {
-			return new ClockWidget(this.parent,this.style);
-		}
-		
+      
 		public ClockWidget build() {
 			return new ClockWidget(this.parent,this.style,this.rgb);
 		}	
