@@ -1,10 +1,10 @@
 package com.ui.plugin.clock.views;
-
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.RGB;
+
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -40,9 +40,22 @@ public class ClockView extends ViewPart {
 		RowLayout layout = new RowLayout(SWT.HORIZONTAL);
 		parent.setLayout(layout);
  
-		final ClockWidget clockWidget1 = ClockWidget.builder().parent(parent).style(SWT.NONE).build();
-		final ClockWidget clockWidget2 = ClockWidget.builder().parent(parent).style(SWT.NONE).build();
-		final ClockWidget clockWidget3 = ClockWidget.builder().parent(parent).style(SWT.NONE).build();
+		final ClockWidget clockWidget1 = ClockWidget.builder()
+				.parent(parent)
+				.style(SWT.NONE)
+				.color(new RGB(255,0,0))
+				.build();
+		final ClockWidget clockWidget2 = ClockWidget.builder()
+				.parent(parent)
+				.color(new RGB(0,255,0))
+				.style(SWT.NONE)
+				.build();
+		final ClockWidget clockWidget3 = ClockWidget.builder()
+				.parent(parent)
+				.color(new RGB(0,0,255))
+				.style(SWT.NONE)
+				.build();
+
 		
 		clockWidget1.setLayoutData(new RowData(20,20));
 		clockWidget2.setLayoutData(new RowData(50,50));
@@ -52,15 +65,16 @@ public class ClockView extends ViewPart {
 		clockWidget2.initPaintListener();
 		clockWidget3.initPaintListener();
 		
-		final Thread runnerClock1 = clockWidget1.moveSecondHand();
-		final Thread runnerClock2 = clockWidget1.moveSecondHand();
-		final Thread runnerClock3 = clockWidget1.moveSecondHand();
-		
-		final ExecutorService services = Executors.newFixedThreadPool(3);
-		
-		services.submit(runnerClock1);
-		services.submit(runnerClock2);
-		services.submit(runnerClock3);
+		/*
+		 * final Thread runnerClock1 = clockWidget1.moveSecondHand(); final Thread
+		 * runnerClock2 = clockWidget1.moveSecondHand(); final Thread runnerClock3 =
+		 * clockWidget1.moveSecondHand();
+		 * 
+		 * final ExecutorService services = Executors.newFixedThreadPool(3);
+		 * 
+		 * services.submit(runnerClock1); services.submit(runnerClock2);
+		 * services.submit(runnerClock3);
+		 */
 
 	}
 
