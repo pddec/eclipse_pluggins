@@ -1,25 +1,19 @@
 package com.ui.plugin.clock.views;
 
-<<<<<<< Updated upstream
-import java.time.LocalTime;
 
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.widgets.Canvas;
-=======
+import java.time.ZoneId;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.DeviceData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Combo;
->>>>>>> Stashed changes
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
+
+import com.ui.plugin.clock.widget.ClockWidget;
 
 /**
  * This sample class demonstrates how to plug-in a new workbench view. The view
@@ -42,33 +36,37 @@ public class ClockView extends ViewPart {
 	 * The ID of the view as specified by the extension.
 	 */
 	public static final String ID = "com.ui.plugin.clock.views.ClockView";
+	
+	private Combo timeZones;
 
 	@Override
 	public void createPartControl(final Composite parent) {
-		final Canvas clock = new Canvas(parent, SWT.NONE);
-		clock.addPaintListener(this::drawClock);
-		clock.addPaintListener(this::paintControl);
 		
-		ClockView.moveSecondHand(clock).start();
+		this.timeZones = new Combo(parent, SWT.DROP_DOWN);
+		this.timeZones.setVisibleItemCount(5);
 		
-	}
+		ZoneId.getAvailableZoneIds().stream()
+		.forEach(this.timeZones::add);
 
-<<<<<<< Updated upstream
-	private void drawClock(final PaintEvent event) {
-		event.gc.drawArc(event.x, event.y, event.width - 1, event.height - 1, 0, 360);
-	}
+		final RowLayout layout = new RowLayout(SWT.HORIZONTAL);
+		parent.setLayout(layout);
+ 
+		final ClockWidget clockWidget1 = ClockWidget.builder()
+				.parent(parent)
+				.style(SWT.NONE)
+				.color(new RGB(255,0,0))
+				.build();
+		final ClockWidget clockWidget2 = ClockWidget.builder()
+				.parent(parent)
+				.color(new RGB(0,255,0))
+				.style(SWT.NONE)
+				.build();
+		final ClockWidget clockWidget3 = ClockWidget.builder()
+				.parent(parent)
+				.color(new RGB(0,0,255))
+				.style(SWT.NONE)
+				.build();
 
-	public void paintControl(final PaintEvent event) {
-		event.gc.drawArc(event.x, event.y, event.width - 1, event.height - 1, 0, 360);
-		final int seconds = LocalTime.now().getSecond();
-		final int arc = (15 - seconds) * 6 % 360;
-		final Color blue = event.display.getSystemColor(SWT.COLOR_BLUE);
-		event.gc.setBackground(blue);
-		event.gc.fillArc(event.x, event.y, event.width - 1, event.height - 1, arc - 1, 2);
-	}
-	
-	private static Thread moveSecondHand(final Canvas clock) {
-=======
 		clockWidget1.setLayoutData(new RowData(20,20));
 		clockWidget2.setLayoutData(new RowData(50,50));
 		clockWidget3.setLayoutData(new RowData(100,100));
@@ -76,28 +74,6 @@ public class ClockView extends ViewPart {
 		final SelectionListener timeZoneClock3 = this.timeZoneListener(clockWidget3);
 		
 		this.timeZones.addSelectionListener(timeZoneClock3);
-		
-		final DeviceData data = parent.getDisplay().getDeviceData();
->>>>>>> Stashed changes
-		
-		final Runnable runClock = () ->{
-			while (!clock.isDisposed()) {
-				try {
-					//clock.redraw();
-					clock.getDisplay().asyncExec(() -> clock.redraw());
-					Thread.sleep(1000);
-				}catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-			}
-		};
-		
-		final Thread runner = new Thread(runClock,"Tick Tack");
-		runner.setUncaughtExceptionHandler((thread, exception) -> {
-			exception.printStackTrace();
-		});
-		
-		return runner;
 		
 	}
 	
