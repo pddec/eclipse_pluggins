@@ -3,13 +3,12 @@ import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.function.Predicate;
 
-
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.DeviceData;
-
 import org.eclipse.swt.graphics.RGB;
-
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Combo;
@@ -46,13 +45,13 @@ public class ClockView extends ViewPart {
 	public void createPartControl(final Composite parent) {
 		
 		this.timeZones = new Combo(parent, SWT.DROP_DOWN);
-		
+
 		this.timeZones.setVisibleItemCount(5);
 		
 		ZoneId.getAvailableZoneIds()
 		.stream().forEach(this.timeZones::add);
 		
-		RowLayout layout = new RowLayout(SWT.HORIZONTAL);
+		final RowLayout layout = new RowLayout(SWT.HORIZONTAL);
 		parent.setLayout(layout);
  
 		final ClockWidget clockWidget1 = ClockWidget.builder()
@@ -94,6 +93,28 @@ public class ClockView extends ViewPart {
 		 * services.submit(runnerClock3);
 		 */
 
+		final SelectionListener timeZoneClock3 = this.timeZoneListener(clockWidget3);
+		
+		this.timeZones.addSelectionListener(timeZoneClock3);
+		
+	}
+	
+	private SelectionListener timeZoneListener(final ClockWidget clockWidget) {
+		return new SelectionListener() {
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent event) {
+				final String id = timeZones.getText();
+				clockWidget.setZone(ZoneId.of(id));
+				clockWidget.redraw();
+			}
+
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				clockWidget.setZone(ZoneId.systemDefault());
+				clockWidget.redraw(); 
+			}
+		};
 	}
 
 	@Override

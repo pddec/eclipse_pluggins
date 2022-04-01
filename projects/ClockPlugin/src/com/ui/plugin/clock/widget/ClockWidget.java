@@ -2,6 +2,9 @@ package com.ui.plugin.clock.widget;
 
 import java.time.LocalTime;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.graphics.Color;
@@ -14,7 +17,8 @@ import org.eclipse.swt.widgets.Composite;
 
 public class ClockWidget extends Canvas {
 
-	private final Color color;
+	private final Color color;	
+	private ZoneId zone = ZoneId.systemDefault();
 
 	private ClockWidget(Composite parent, int style) {
 		super(parent, style);
@@ -33,19 +37,29 @@ public class ClockWidget extends Canvas {
 
 	public void initPaintListener() {
 		this.addPaintListener(this::drawClock);
-		this.addPaintListener(this::paintControl);
+		this.addPaintListener(this::paintSecondsHand);
+		this.addPaintListener(this::paintHoursHand);
 	}
 	
 	public void initDisposeListener() {
 		this.addDisposeListener(e -> this.color.dispose());
 	}
 
-
 	private void drawClock(final PaintEvent event) {
 		event.gc.drawArc(event.x, event.y, event.width - 1, event.height - 1, 0, 360);
 	}
+	
+	public void paintHoursHand(final PaintEvent event) {
+		event.gc.setBackground(event.display.getSystemColor(SWT.COLOR_BLACK));
+		final ZonedDateTime now = ZonedDateTime.now(this.zone);
+		
+		final int hours = now.getHour();
+		final int arc = (3 - hours) * 30 % 360;
+		
+		event.gc.fillArc(event.x, event.y, event.width-1, event.height-1, arc - 5, 10);
+	}
 
-	public void paintControl(final PaintEvent event) {
+	public void paintSecondsHand(final PaintEvent event) {
 		event.gc.drawArc(event.x, event.y, event.width - 1, event.height - 1, 0, 360);
 		final int seconds = LocalTime.now().getSecond();
 		final int arc = (15 - seconds) * 6 % 360;
@@ -111,6 +125,10 @@ public class ClockWidget extends Canvas {
 		return new ClockWidgetBuilder();
 	}
 	
+	public void setZone(ZoneId zone) {
+		this.zone = zone;
+	}
+
 	public static class ClockWidgetBuilder {
 		
 		private Composite parent;
