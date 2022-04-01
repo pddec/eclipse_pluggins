@@ -1,16 +1,17 @@
 package com.ui.plugin.clock.views;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.function.Predicate;
 
-
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.DeviceData;
-
 import org.eclipse.swt.graphics.RGB;
-
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
 
@@ -37,11 +38,19 @@ public class ClockView extends ViewPart {
 	 * The ID of the view as specified by the extension.
 	 */
 	public static final String ID = "com.ui.plugin.clock.views.ClockView";
+	
+	private Combo timeZones;
 
 	@Override
 	public void createPartControl(final Composite parent) {
 		
-		RowLayout layout = new RowLayout(SWT.HORIZONTAL);
+		this.timeZones = new Combo(parent, SWT.DROP_DOWN);
+		this.timeZones.setVisibleItemCount(5);
+		
+		ZoneId.getAvailableZoneIds().stream()
+		.forEach(this.timeZones::add);
+
+		final RowLayout layout = new RowLayout(SWT.HORIZONTAL);
 		parent.setLayout(layout);
  
 		final ClockWidget clockWidget1 = ClockWidget.builder()
@@ -60,19 +69,12 @@ public class ClockView extends ViewPart {
 				.style(SWT.NONE)
 				.build();
 
-		clockWidget1.initDisposeListener();
-		clockWidget2.initDisposeListener();
-		clockWidget3.initDisposeListener();
-		
-		clockWidget1.initPaintListener();
-		clockWidget2.initPaintListener();
-		clockWidget3.initPaintListener();
-		
 
 		clockWidget1.setLayoutData(new RowData(20,20));
 		clockWidget2.setLayoutData(new RowData(50,50));
 		clockWidget3.setLayoutData(new RowData(100,100));
 		
+
 		final DeviceData data = parent.getDisplay().getDeviceData();
 		
 		final Predicate<Object> predicate = object -> object instanceof Color;
@@ -92,6 +94,28 @@ public class ClockView extends ViewPart {
 		 * services.submit(runnerClock3);
 		 */
 
+		final SelectionListener timeZoneClock3 = this.timeZoneListener(clockWidget3);
+		
+		this.timeZones.addSelectionListener(timeZoneClock3);
+		
+	}
+	
+	private SelectionListener timeZoneListener(final ClockWidget clockWidget) {
+		return new SelectionListener() {
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent event) {
+				final String id = timeZones.getText();
+				clockWidget.setZone(ZoneId.of(id));
+				clockWidget.redraw();
+			}
+
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				clockWidget.setZone(ZoneId.systemDefault());
+				clockWidget.redraw(); 
+			}
+		};
 	}
 
 	@Override
