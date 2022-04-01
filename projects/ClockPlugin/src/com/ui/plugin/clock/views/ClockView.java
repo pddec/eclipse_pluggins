@@ -1,11 +1,23 @@
 package com.ui.plugin.clock.views;
 
+<<<<<<< Updated upstream
 import java.time.LocalTime;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Canvas;
+=======
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.DeviceData;
+import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.layout.RowData;
+import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.Combo;
+>>>>>>> Stashed changes
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
 
@@ -41,6 +53,7 @@ public class ClockView extends ViewPart {
 		
 	}
 
+<<<<<<< Updated upstream
 	private void drawClock(final PaintEvent event) {
 		event.gc.drawArc(event.x, event.y, event.width - 1, event.height - 1, 0, 360);
 	}
@@ -55,6 +68,17 @@ public class ClockView extends ViewPart {
 	}
 	
 	private static Thread moveSecondHand(final Canvas clock) {
+=======
+		clockWidget1.setLayoutData(new RowData(20,20));
+		clockWidget2.setLayoutData(new RowData(50,50));
+		clockWidget3.setLayoutData(new RowData(100,100));
+		
+		final SelectionListener timeZoneClock3 = this.timeZoneListener(clockWidget3);
+		
+		this.timeZones.addSelectionListener(timeZoneClock3);
+		
+		final DeviceData data = parent.getDisplay().getDeviceData();
+>>>>>>> Stashed changes
 		
 		final Runnable runClock = () ->{
 			while (!clock.isDisposed()) {
@@ -75,6 +99,24 @@ public class ClockView extends ViewPart {
 		
 		return runner;
 		
+	}
+	
+	private SelectionListener timeZoneListener(final ClockWidget clockWidget) {
+		return new SelectionListener() {
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent event) {
+				final String id = timeZones.getText();
+				clockWidget.setZone(ZoneId.of(id));
+				clockWidget.redraw();
+			}
+
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				clockWidget.setZone(ZoneId.systemDefault());
+				clockWidget.redraw(); 
+			}
+		};
 	}
 
 	@Override
