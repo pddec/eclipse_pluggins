@@ -101,18 +101,20 @@ public class Activator extends AbstractUIPlugin {
 			that.trayItem.setText("Hello World");
 			that.trayItem.setImage(that.image);
 			
-			final SelectionAdapter openShell = Activator.openShell(display);
+			final SelectionAdapter openShell = Activator.openShell(display)
+					.apply(that);
 			
 			that.trayItem.addSelectionListener(openShell);
 		}; 
-		
 	}
 	
-	private static SelectionAdapter openShell(final Display display) {
-		return new SelectionAdapter() {
+	private static Function<Activator,SelectionAdapter> openShell(final Display display) {
+		return (that) -> new SelectionAdapter() {
 	
 		  public void widgetSelected(SelectionEvent e) {
-			    final Shell shell = new Shell(display);
+			    final Shell shell = new Shell(that.trayItem.getDisplay(), SWT.NO_TRIM | SWT.ON_TOP);
+			    
+			    shell.setAlpha(128);
 			    shell.setLayout(new FillLayout());
 			    
 			    ClockWidget.builder()
