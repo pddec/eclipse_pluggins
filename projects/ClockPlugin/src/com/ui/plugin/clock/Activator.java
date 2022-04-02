@@ -112,10 +112,12 @@ public class Activator extends AbstractUIPlugin {
 		return (that) -> new SelectionAdapter() {
 	
 		  public void widgetSelected(SelectionEvent e) {
-			    final Shell shell = new Shell(that.trayItem.getDisplay(), SWT.NO_TRIM | SWT.ON_TOP);
+			    final Shell shell = new Shell(that.trayItem.getDisplay(), SWT.APPLICATION_MODAL);
 			    
 			    shell.setAlpha(128);
 			    shell.setLayout(new FillLayout());
+			    shell.setFullScreen(true);
+			    shell.setMaximized(true);
 			    
 			    ClockWidget.builder()
 			    	.shell(shell)
