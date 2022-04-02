@@ -28,27 +28,26 @@ public class Activator extends AbstractUIPlugin {
 	/**
 	 * The constructor
 	 */
-	public Activator() {
-	}
+	public Activator() {}
 
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		plugin = this;
+		Activator.plugin = this;
 
 		final Display display = Display.getDefault();
-		
+
 		display.asyncExec(() -> {
 
 			final InputStream resourceAsStream = Activator.class.getResourceAsStream("/icons/sample.gif");
-			
+
 			this.image = new Image(display, resourceAsStream);
 
 			final Tray tray = display.getSystemTray();
-			
-			if (Objects.isNull(tray) && Objects.isNull(this.image))
+
+			if (Objects.isNull(tray) && !this.hasImage())
 				return;
-			
+
 			this.trayItem = new TrayItem(tray, SWT.NONE);
 			this.trayItem.setToolTipText("Hello World");
 			this.trayItem.setVisible(true);
@@ -58,10 +57,24 @@ public class Activator extends AbstractUIPlugin {
 		});
 	}
 
+	private boolean hasImage() {
+		return Objects.nonNull(this.image);
+	}
+
+	private boolean hasTrayItem() {
+		return Objects.nonNull(this.trayItem);
+	}
+
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		plugin = null;
+		Activator.plugin = null;
 		super.stop(context);
+
+		if (!this.hasTrayItem()) 
+			Display.getDefault().asyncExec(trayItem::dispose);
+		
+		if (!this.hasImage()) 
+			Display.getDefault().asyncExec(image::dispose);
 	}
 
 	/**
@@ -70,7 +83,7 @@ public class Activator extends AbstractUIPlugin {
 	 * @return the shared instance
 	 */
 	public static Activator getDefault() {
-		return plugin;
+		return Activator.plugin;
 	}
 
 }
