@@ -1,5 +1,13 @@
 package com.ui.plugin.clock;
 
+import java.io.InputStream;
+import java.util.Objects;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Tray;
+import org.eclipse.swt.widgets.TrayItem;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -13,7 +21,10 @@ public class Activator extends AbstractUIPlugin {
 
 	// The shared instance
 	private static Activator plugin;
-	
+
+	private TrayItem trayItem;
+	private Image image;
+
 	/**
 	 * The constructor
 	 */
@@ -24,6 +35,27 @@ public class Activator extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+
+		final Display display = Display.getDefault();
+		
+		display.asyncExec(() -> {
+
+			final InputStream resourceAsStream = Activator.class.getResourceAsStream("/icons/sample.gif");
+			
+			this.image = new Image(display, resourceAsStream);
+
+			final Tray tray = display.getSystemTray();
+			
+			if (Objects.isNull(tray) && Objects.isNull(this.image))
+				return;
+			
+			this.trayItem = new TrayItem(tray, SWT.NONE);
+			this.trayItem.setToolTipText("Hello World");
+			this.trayItem.setVisible(true);
+			this.trayItem.setText("Hello World");
+			this.trayItem.setImage(this.image);
+
+		});
 	}
 
 	@Override
