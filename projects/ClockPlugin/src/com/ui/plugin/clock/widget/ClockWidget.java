@@ -14,12 +14,13 @@ import org.eclipse.swt.graphics.RGB;
 
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Shell;
 
 public class ClockWidget extends Canvas {
 
 	private final Color color;	
 	private ZoneId zone = ZoneId.systemDefault();
-
+	
 	private ClockWidget(Composite parent, int style) {
 		super(parent, style);
 		final RGB rgb = new RGB(SWT.COLOR_BLUE,SWT.COLOR_BLUE,SWT.COLOR_BLUE);
@@ -98,9 +99,8 @@ public class ClockWidget extends Canvas {
 	 * }
 	 */
 
-	public Thread moveSecondHand() {
-
-		final Runnable runClock = () -> {
+	public Runnable moveSecondHand() {
+		return () -> {
 			while (!this.isDisposed()) {
 				try {
 					// clock.redraw();
@@ -111,14 +111,6 @@ public class ClockWidget extends Canvas {
 				}
 			}
 		};
-
-		final Thread runner = new Thread(runClock, "Tick Tack");
-		runner.setUncaughtExceptionHandler((thread, exception) -> {
-			exception.printStackTrace();
-		});
-
-		return runner;
-
 	}
 	
 	public static ClockWidgetBuilder builder() {
@@ -153,6 +145,11 @@ public class ClockWidget extends Canvas {
         
 		public ClockWidget build() {
 			return new ClockWidget(this.parent,this.style,this.rgb);
+		}
+
+		public ClockWidgetBuilder shell(final Shell shell) {
+			this.parent = shell;
+			return this;
 		}	
 	}
 }
