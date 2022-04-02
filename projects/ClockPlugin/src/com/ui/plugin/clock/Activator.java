@@ -4,12 +4,19 @@ import java.io.InputStream;
 import java.util.Objects;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tray;
 import org.eclipse.swt.widgets.TrayItem;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
+
+import com.ui.plugin.clock.widget.ClockWidget;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -36,25 +43,10 @@ public class Activator extends AbstractUIPlugin {
 		Activator.plugin = this;
 
 		final Display display = Display.getDefault();
+		
+		this.trayItem.addSelectionListener(Activator.openShell(display));
 
-		display.asyncExec(() -> {
-
-			final InputStream resourceAsStream = Activator.class.getResourceAsStream("/icons/sample.gif");
-
-			this.image = new Image(display, resourceAsStream);
-
-			final Tray tray = display.getSystemTray();
-
-			if (Objects.isNull(tray) && !this.hasImage())
-				return;
-
-			this.trayItem = new TrayItem(tray, SWT.NONE);
-			this.trayItem.setToolTipText("Hello World");
-			this.trayItem.setVisible(true);
-			this.trayItem.setText("Hello World");
-			this.trayItem.setImage(this.image);
-
-		});
+		display.asyncExec(Activator.trayRunner(this,display));
 	}
 
 	private boolean hasImage() {
@@ -84,6 +76,49 @@ public class Activator extends AbstractUIPlugin {
 	 */
 	public static Activator getDefault() {
 		return Activator.plugin;
+	}
+	
+	
+	private static Runnable trayRunner(final Activator that, final Display display) {
+		
+		return () -> {
+
+			final InputStream resourceAsStream = Activator.class.getResourceAsStream("/icons/sample.gif");
+
+			that.image = new Image(display, resourceAsStream);
+
+			final Tray tray = display.getSystemTray();
+
+			if (Objects.isNull(tray) && !that.hasImage())
+				return;
+
+			that.trayItem = new TrayItem(tray, SWT.NONE);
+			that.trayItem.setToolTipText("Hello World");
+			that.trayItem.setVisible(true);
+			that.trayItem.setText("Hello World");
+			that.trayItem.setImage(that.image);
+
+		}; 
+		
+	}
+	
+	private static SelectionAdapter openShell(final Display display) {
+		return new SelectionAdapter() {
+	
+		  public void widgetSelected(SelectionEvent e) {
+			    final Shell shell = new Shell(display);
+			    shell.setLayout(new FillLayout());
+			    
+			    ClockWidget.builder()
+			    	.shell(shell)
+			    	.style(SWT.NONE)
+			    	.color(new RGB(255, 0, 255))
+			    	.build();
+			    
+			    shell.pack();
+			    shell.open();
+			  }
+			};
 	}
 
 }
