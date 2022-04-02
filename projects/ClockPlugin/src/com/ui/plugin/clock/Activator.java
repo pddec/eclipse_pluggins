@@ -2,6 +2,7 @@ package com.ui.plugin.clock;
 
 import java.io.InputStream;
 import java.util.Objects;
+import java.util.function.Function;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -44,9 +45,11 @@ public class Activator extends AbstractUIPlugin {
 
 		final Display display = Display.getDefault();
 		
-		this.trayItem.addSelectionListener(Activator.openShell(display));
-
-		display.asyncExec(Activator.trayRunner(this,display));
+		final Runnable runner = Activator.trayRunner(this)
+				.apply(display); 
+		
+		display.asyncExec(runner); 
+		
 	}
 
 	private boolean hasImage() {
@@ -60,6 +63,7 @@ public class Activator extends AbstractUIPlugin {
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		Activator.plugin = null;
+		
 		super.stop(context);
 
 		if (!this.hasTrayItem()) 
@@ -79,10 +83,9 @@ public class Activator extends AbstractUIPlugin {
 	}
 	
 	
-	private static Runnable trayRunner(final Activator that, final Display display) {
+	private static Function<Display,Runnable> trayRunner(final Activator that) {
 		
-		return () -> {
-
+		return (display) -> () -> {
 			final InputStream resourceAsStream = Activator.class.getResourceAsStream("/icons/sample.gif");
 
 			that.image = new Image(display, resourceAsStream);
@@ -97,7 +100,10 @@ public class Activator extends AbstractUIPlugin {
 			that.trayItem.setVisible(true);
 			that.trayItem.setText("Hello World");
 			that.trayItem.setImage(that.image);
-
+			
+			final SelectionAdapter openShell = Activator.openShell(display);
+			
+			that.trayItem.addSelectionListener(openShell);
 		}; 
 		
 	}
