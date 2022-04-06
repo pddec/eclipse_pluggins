@@ -73,10 +73,10 @@ public class ClockWidget extends Canvas {
 		if (size == SWT.DEFAULT)
 			return new Point(50, 50);
 		
-		if (width == SWT.DEFAULT)
+		if (width == SWT.DEFAULT && size > SWT.DEFAULT)
 			return new Point(height, height);
 
-		if (height == SWT.DEFAULT)
+		if (height == SWT.DEFAULT && size > SWT.DEFAULT)
 			return new Point(width, width);
 
 		return new Point(size, size);

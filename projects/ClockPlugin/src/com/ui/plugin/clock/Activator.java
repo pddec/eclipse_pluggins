@@ -142,11 +142,14 @@ public class Activator extends AbstractUIPlugin {
 				shell.setRegion(region);
 				shell.setLayout(new FillLayout());
 				
-				ClockWidget.builder()
+				final ClockWidget clock = ClockWidget.builder()
 					.shell(shell)
 					.style(SWT.NONE)
 					.color(new RGB(255, 0, 255))
 					.build();
+				
+				clock.initDisposeListener();
+				clock.initPaintListener();
 		
 				shell.pack();
 				shell.open();
