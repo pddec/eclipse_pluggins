@@ -79,8 +79,14 @@ public class ClockView extends ViewPart {
 
 				
 		clockWidget1.setLayoutData(new RowData(20, 20));
+		clockWidget1.initDisposeListener();
+		clockWidget1.initPaintListener();
 		clockWidget2.setLayoutData(new RowData(50, 50));
+		clockWidget2.initDisposeListener();
+		clockWidget2.initPaintListener();
 		clockWidget3.setLayoutData(new RowData(100, 100));
+		clockWidget3.initDisposeListener();
+		clockWidget3.initPaintListener();
 
 		final DeviceData data = parent.getDisplay().getDeviceData();
 
