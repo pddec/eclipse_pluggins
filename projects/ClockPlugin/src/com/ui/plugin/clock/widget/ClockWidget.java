@@ -25,15 +25,11 @@ public class ClockWidget extends Canvas {
 		super(parent, style);
 		final RGB rgb = new RGB(SWT.COLOR_BLUE,SWT.COLOR_BLUE,SWT.COLOR_BLUE);
 		this.color = new Color(parent.getDisplay(), rgb);
-		this.initDisposeListener();
-		this.initPaintListener();
 	}
 	
 	private ClockWidget(Composite parent, int style,final RGB rgb) {
 		super(parent, style);
 		this.color = new Color(parent.getDisplay(),rgb);
-		this.initDisposeListener();
-		this.initPaintListener();
 	}
 
 	public void initPaintListener() {
@@ -72,16 +68,16 @@ public class ClockWidget extends Canvas {
 	@Override
 	public Point computeSize(int width, int height, boolean changed) {
 
-		if (width == SWT.DEFAULT)
-			return new Point(height, height);
-		
-		if (height == SWT.DEFAULT)
-			return new Point(width, width);
-
 		final int size = Math.min(width, height);
 
 		if (size == SWT.DEFAULT)
-			new Point(50, 50);
+			return new Point(50, 50);
+		
+		if (width == SWT.DEFAULT && size > SWT.DEFAULT)
+			return new Point(height, height);
+
+		if (height == SWT.DEFAULT && size > SWT.DEFAULT)
+			return new Point(width, width);
 
 		return new Point(size, size);
 	}
