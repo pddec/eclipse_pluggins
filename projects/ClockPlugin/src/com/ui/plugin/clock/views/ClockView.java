@@ -6,6 +6,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.function.Function;
+
 import java.util.function.Predicate;
 
 import org.eclipse.swt.SWT;
@@ -88,6 +89,7 @@ public class ClockView extends ViewPart {
 		clockWidget3.initDisposeListener();
 		clockWidget3.initPaintListener();
 
+
 		final DeviceData data = parent.getDisplay().getDeviceData();
 
 		final Predicate<Object> predicate = object -> object instanceof Color;
@@ -106,12 +108,15 @@ public class ClockView extends ViewPart {
 		 services.submit(runnerClock2); 
 		 services.submit(runnerClock3);
 
+
 		final SelectionListener timeZoneClock3 = ClockView.timeZoneListener(this)
 				.apply(clockWidget3);
+
 
 		this.timeZones.addSelectionListener(timeZoneClock3);
 
 	}
+
 
 	private static Function< ClockWidget, SelectionListener>  timeZoneListener(final ClockView that) {
 		return (clockWidget) -> new SelectionListener() {

@@ -9,7 +9,9 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
+
 import org.eclipse.swt.graphics.Region;
+
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -37,8 +39,7 @@ public class Activator extends AbstractUIPlugin {
 	/**
 	 * The constructor
 	 */
-	public Activator() {
-	}
+	public Activator() {}
 
 	@Override
 	public void start(BundleContext context) throws Exception {
@@ -46,10 +47,10 @@ public class Activator extends AbstractUIPlugin {
 		Activator.plugin = this;
 
 		final Display display = Display.getDefault();
-
 		final Runnable runner = Activator.trayRunner(this).apply(display);
 
 		display.asyncExec(runner);
+
 
 	}
 
@@ -64,9 +65,7 @@ public class Activator extends AbstractUIPlugin {
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		Activator.plugin = null;
-
 		super.stop(context);
-
 		if (!this.hasTrayItem())
 			Display.getDefault().asyncExec(trayItem::dispose);
 
@@ -82,8 +81,7 @@ public class Activator extends AbstractUIPlugin {
 	public static Activator getDefault() {
 		return Activator.plugin;
 	}
-
-	private static Function<Display, Runnable> trayRunner(final Activator that) {
+	private static Function<Display,Runnable> trayRunner(final Activator that) {
 
 		return (display) -> () -> {
 			final InputStream resourceAsStream = Activator.class.getResourceAsStream("/icons/sample.gif");
