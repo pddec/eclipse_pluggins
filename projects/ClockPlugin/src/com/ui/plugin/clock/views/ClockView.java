@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import org.eclipse.swt.SWT;
@@ -99,14 +100,15 @@ public class ClockView extends ViewPart {
 		 services.submit(runnerClock2); 
 		 services.submit(runnerClock3);
 
-		final SelectionListener timeZoneClock3 = this.timeZoneListener(clockWidget3);
+		final SelectionListener timeZoneClock3 = ClockView.timeZoneListener(this)
+				.apply(clockWidget3);
 
 		this.timeZones.addSelectionListener(timeZoneClock3);
 
 	}
 
-	private SelectionListener timeZoneListener(final ClockWidget clockWidget) {
-		return new SelectionListener() {
+	private static Function< ClockWidget, SelectionListener>  timeZoneListener(final ClockView that) {
+		return (clockWidget) -> new SelectionListener() {
 
 			@Override
 			public void widgetDefaultSelected(final SelectionEvent event) {
@@ -116,7 +118,7 @@ public class ClockView extends ViewPart {
 
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
-				final String id = timeZones.getText();
+				final String id = that.timeZones.getText();
 				clockWidget.setZone(ZoneId.of(id));
 				clockWidget.redraw();
 			}
