@@ -76,10 +76,7 @@ public class ClockWidget extends Canvas {
 		if (width == SWT.DEFAULT && size > SWT.DEFAULT)
 			return new Point(height, height);
 
-		if (height == SWT.DEFAULT && size > SWT.DEFAULT)
-			return new Point(width, width);
-
-		return new Point(size, size);
+		return new Point(width, width);
 	}
 	
 	/*
@@ -95,12 +92,12 @@ public class ClockWidget extends Canvas {
 	 * }
 	 */
 
-	public Runnable moveSecondHand() {
+	public static Runnable moveSecondHand(final ClockWidget that) {
 		return () -> {
-			while (!this.isDisposed()) {
+			while (!that.isDisposed()) {
 				try {
 					// clock.redraw();
-					this.getDisplay().asyncExec(() -> this.redraw());
+					that.getDisplay().asyncExec(() -> that.redraw());
 					Thread.sleep(1000);
 				} catch (Exception e) {
 					throw new RuntimeException(e);

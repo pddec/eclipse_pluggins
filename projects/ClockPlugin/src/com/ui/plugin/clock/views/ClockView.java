@@ -55,7 +55,8 @@ public class ClockView extends ViewPart {
 		this.timeZones.setVisibleItemCount(5);
 
 		ZoneId.getAvailableZoneIds()
-		.stream().forEach(this.timeZones::add);
+		.stream()
+		.forEach(this.timeZones::add);
 
 		final RowLayout layout = new RowLayout(SWT.HORIZONTAL);
 		parent.setLayout(layout);
@@ -65,20 +66,19 @@ public class ClockView extends ViewPart {
 				.style(SWT.NONE)
 				.color(new RGB(255, 0, 0))
 				.build();
-		
+
 		final ClockWidget clockWidget2 = ClockWidget.builder()
 				.parent(parent)
 				.color(new RGB(0, 255, 0))
 				.style(SWT.NONE)
 				.build();
-		
+
 		final ClockWidget clockWidget3 = ClockWidget.builder()
 				.parent(parent)
 				.color(new RGB(0, 0, 255))
 				.style(SWT.NONE)
 				.build();
 
-				
 		clockWidget1.setLayoutData(new RowData(20, 20));
 		clockWidget1.initDisposeListener();
 		clockWidget1.initPaintListener();
@@ -89,7 +89,6 @@ public class ClockView extends ViewPart {
 		clockWidget3.initDisposeListener();
 		clockWidget3.initPaintListener();
 
-
 		final DeviceData data = parent.getDisplay().getDeviceData();
 
 		final Predicate<Object> predicate = object -> object instanceof Color;
@@ -98,27 +97,24 @@ public class ClockView extends ViewPart {
 
 		System.err.println("There are " + count + " Color instances");
 
-		 final Runnable runnerClock1 = clockWidget1.moveSecondHand(); 
-		 final Runnable runnerClock2 = clockWidget2.moveSecondHand(); 
-		 final Runnable runnerClock3 = clockWidget3.moveSecondHand(); 
-		 
-		 final ExecutorService services = Executors.newFixedThreadPool(3,ClockView.clockFactory()); 
-		 
-		 services.submit(runnerClock1);
-		 services.submit(runnerClock2); 
-		 services.submit(runnerClock3);
+		final Runnable runnerClock1 = ClockWidget.moveSecondHand(clockWidget1);
+		final Runnable runnerClock2 = ClockWidget.moveSecondHand(clockWidget2);
+		final Runnable runnerClock3 = ClockWidget.moveSecondHand(clockWidget3);
 
+		final ExecutorService services = Executors.newFixedThreadPool(3, ClockView.clockFactory());
+
+		services.submit(runnerClock1);
+		services.submit(runnerClock2);
+		services.submit(runnerClock3);
 
 		final SelectionListener timeZoneClock3 = ClockView.timeZoneListener(this)
 				.apply(clockWidget3);
-
 
 		this.timeZones.addSelectionListener(timeZoneClock3);
 
 	}
 
-
-	private static Function< ClockWidget, SelectionListener>  timeZoneListener(final ClockView that) {
+	private static Function<ClockWidget, SelectionListener> timeZoneListener(final ClockView that) {
 		return (clockWidget) -> new SelectionListener() {
 
 			@Override
@@ -135,18 +131,16 @@ public class ClockView extends ViewPart {
 			}
 		};
 	}
-	
-	
+
 	private static ThreadFactory clockFactory() {
 		return (final Runnable runClock) -> {
 			final Thread runner = new Thread(runClock, "Tick Tack");
 			runner.setUncaughtExceptionHandler((thread, exception) -> {
 				exception.printStackTrace();
 			});
-				return runner;
+			return runner;
 		};
 	}
-
 
 	@Override
 	public void setFocus() {
