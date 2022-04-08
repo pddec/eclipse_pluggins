@@ -84,7 +84,7 @@ public class TimeZoneView extends ViewPart {
 						.parent(group)
 						.style(SWT.NONE)
 						.color(rgb)
-					
+						.zone(zone)
 						.build();
 				
 				clock.initDisposeListener();
@@ -93,7 +93,8 @@ public class TimeZoneView extends ViewPart {
 		};
 	}
 
-	public static Comparator<ZoneId> comparator() {
+
+	private static Comparator<ZoneId> comparator() {
 
 		return new Comparator<ZoneId>() {
 

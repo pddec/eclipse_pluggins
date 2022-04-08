@@ -65,18 +65,21 @@ public class ClockView extends ViewPart {
 				.parent(parent)
 				.style(SWT.NONE)
 				.color(new RGB(255, 0, 0))
+				.zone(ZoneId.systemDefault())
 				.build();
 
 		final ClockWidget clockWidget2 = ClockWidget.builder()
 				.parent(parent)
 				.color(new RGB(0, 255, 0))
 				.style(SWT.NONE)
+				.zone(ZoneId.systemDefault())
 				.build();
 
 		final ClockWidget clockWidget3 = ClockWidget.builder()
 				.parent(parent)
 				.color(new RGB(0, 0, 255))
 				.style(SWT.NONE)
+				.zone(ZoneId.systemDefault())
 				.build();
 
 		clockWidget1.setLayoutData(new RowData(20, 20));

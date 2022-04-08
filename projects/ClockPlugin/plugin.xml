@@ -30,7 +30,7 @@
             name="Time Zone View"
             restorable="true">
       </view>
-      <category
+	<category
             id="com.ui.plugin.clock"
             name="Time Zone Tree">
       </category>
@@ -43,6 +43,7 @@
             restorable="true"
             name="Time Zone Tree View">
       </view>
+
 
    </extension>
    <extension
@@ -66,6 +67,7 @@
                relative="org.eclipse.ui.views.ProblemView">
          </view>
       </perspectiveExtension>
+
       <perspectiveExtension
             targetID="org.eclipse.jdt.ui.JavaPerspective">
          <view
@@ -83,9 +85,11 @@
             file="contexts.xml">
       </contexts>
 
+
       <contexts
             file="contexts.xml">
       </contexts>
+
       <contexts
             file="contexts.xml">
       </contexts>
