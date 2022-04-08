@@ -6,13 +6,13 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Map;
-import java.time.LocalTime;
-import java.time.ZonedDateTime;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
 import org.eclipse.e4.ui.di.Focus;
+import org.eclipse.jface.resource.FontRegistry;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
@@ -23,8 +23,8 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.ISharedImages;
@@ -75,7 +75,9 @@ public class TimeZoneTreeView extends ViewPart {
 		final URL sample = this.getClass().getResource("/icons/sample.gif");
 		ir.put("sample", ImageDescriptor.createFromURL(sample));
 		
-		final TimeZoneLabelProvider labelProvider = new TimeZoneLabelProvider(this.images,ir);
+		final FontRegistry fr = JFaceResources.getFontRegistry();
+		
+		final TimeZoneLabelProvider labelProvider = new TimeZoneLabelProvider(this.images,ir,fr);
 		final DelegatingStyledCellLabelProvider delegatingStyled = new DelegatingStyledCellLabelProvider(labelProvider);
 		
 		treeViewer.setLabelProvider(delegatingStyled);
@@ -138,12 +140,21 @@ public class TimeZoneTreeView extends ViewPart {
 		  
 
 		private final ISharedImages images;
+		private final FontRegistry fr;
+
+	
 		private ImageRegistry ir;
 
-		public TimeZoneLabelProvider(ISharedImages images, ImageRegistry ir) {
+		public TimeZoneLabelProvider(ISharedImages images, ImageRegistry ir, FontRegistry fr) {
 			this.images = images;
 			this.ir = ir;
+			this.fr = fr;
 		}
+		
+		public Font getFont(Object element) {
+		    final Font italic = fr.getItalic(JFaceResources.DEFAULT_FONT);
+		    return italic;
+		  } 
 
 		@SuppressWarnings("rawtypes")
 		public String getText(Object element) {
