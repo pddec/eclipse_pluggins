@@ -1,17 +1,33 @@
 package com.ui.plugin.clock.views;
 
+import java.net.URL;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Map;
+import java.time.LocalTime;
+import java.time.ZonedDateTime;
 
 import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 
 import org.eclipse.e4.ui.di.Focus;
+import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.resource.LocalResourceManager;
+import org.eclipse.jface.resource.ResourceManager;
+import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
+import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.part.ViewPart;
 
 /**
@@ -37,26 +53,43 @@ public class TimeZoneTreeView extends ViewPart {
 	public static final String ID = "TimeZoneTreeView";
 
 	private TreeViewer treeViewer;
-	
+
+	@Inject
+	private ISharedImages images;
+
 	@Override
-	public void createPartControl(Composite parent) {}
+	public void createPartControl(Composite parent) {
+	}
 
 	@PostConstruct
 	public void create(Composite parent) {
 		final TreeViewer treeViewer = new TreeViewer(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.MULTI);
-		treeViewer.setLabelProvider(new TimeZoneLabelProvider());
-		treeViewer.setContentProvider(new TimeZoneContentProvider());
-		treeViewer.setInput(new Object[]{TimeZoneView.getTimeZones()}); 
 		
+		final ResourceManager rm = JFaceResources.getResources();
+		final LocalResourceManager lrm = new LocalResourceManager(rm, parent);
+
+		treeViewer.setContentProvider(new TimeZoneContentProvider());
+		treeViewer.setInput(new Object[] { TimeZoneView.getTimeZones() });
+		
+		final ImageRegistry ir = new ImageRegistry(lrm);
+		final URL sample = this.getClass().getResource("/icons/sample.gif");
+		ir.put("sample", ImageDescriptor.createFromURL(sample));
+		
+		final TimeZoneLabelProvider labelProvider = new TimeZoneLabelProvider(this.images,ir);
+		final DelegatingStyledCellLabelProvider delegatingStyled = new DelegatingStyledCellLabelProvider(labelProvider);
+		
+		treeViewer.setLabelProvider(delegatingStyled);
+
+ 
 		this.treeViewer = treeViewer;
 	}
 
 	@Focus
 	public void focus() {
-	  this.treeViewer.getControl().setFocus();
+		this.treeViewer.getControl().setFocus();
 	}
-	
-	public class TimeZoneContentProvider implements ITreeContentProvider{
+
+	public class TimeZoneContentProvider implements ITreeContentProvider {
 		@Override
 		@SuppressWarnings("rawtypes")
 		public Object[] getChildren(Object parentElement) {
@@ -68,9 +101,8 @@ public class TimeZoneTreeView extends ViewPart {
 
 			if (parentElement instanceof Collection)
 				return ((Collection) parentElement).toArray();
-			
-			return new Object[0];
 
+			return new Object[0];
 		}
 
 		@Override
@@ -99,12 +131,23 @@ public class TimeZoneTreeView extends ViewPart {
 
 			return false;
 		}
-		
+
 	}
 
-	public class TimeZoneLabelProvider extends LabelProvider  {
+	public class TimeZoneLabelProvider extends LabelProvider implements IStyledLabelProvider {
+		  
+
+		private final ISharedImages images;
+		private ImageRegistry ir;
+
+		public TimeZoneLabelProvider(ISharedImages images, ImageRegistry ir) {
+			this.images = images;
+			this.ir = ir;
+		}
+
 		@SuppressWarnings("rawtypes")
 		public String getText(Object element) {
+			
 			if (element instanceof Map)
 				return "Time Zones";
 
@@ -115,15 +158,36 @@ public class TimeZoneTreeView extends ViewPart {
 				return ((ZoneId) element).getId().split("/")[1];
 
 			return "Unknown type: " + element.getClass();
-
 		}
-
 		
+		public StyledString getStyledText(Object element) {
+		    final String text = getText(element);
+		    final StyledString styledString = new StyledString(text);
+		    final boolean instance = element instanceof ZoneId;
+		    
+		    if (instance) {
+		      final ZoneId zone = (ZoneId) element;
+		      final ZoneOffset offset = ZonedDateTime.now(zone).getOffset();
+		      styledString.append(" (" + offset + ")", StyledString.DECORATIONS_STYLER);
+		    }
+		    
+		    return styledString;
+		  }
+
+		public Image getImage(Object element) {
+			if (element instanceof Map.Entry)
+				return this.images.getImage(ISharedImages.IMG_OBJ_FOLDER);
+			
+			if (element instanceof ZoneId) 
+			    return this.ir.get("sample");
+			
+			return super.getImage(element);
+		}
 	}
 
 	@Override
 	public void setFocus() {
 		// TODO Auto-generated method stub
-		
+
 	}
 }
