@@ -93,6 +93,7 @@ public class TimeZoneView extends ViewPart {
 		};
 	}
 
+
 	private static Comparator<ZoneId> comparator() {
 
 		return new Comparator<ZoneId>() {
