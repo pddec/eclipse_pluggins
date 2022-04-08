@@ -52,7 +52,6 @@ public class Activator extends AbstractUIPlugin {
 
 		display.asyncExec(runner);
 
-
 	}
 
 	private boolean hasImage() {
