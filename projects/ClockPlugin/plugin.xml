@@ -16,6 +16,34 @@
             category="ClockPlugin"
             inject="true">
       </view>
+
+      <category
+            id="TimeZoneView"
+            name="TimeZone Keeper">
+      </category>
+      <view
+            category="TimeZoneView"
+            class="com.ui.plugin.clock.views.TimeZoneView"
+            icon="icons/sample.png"
+            id="com.ui.plugin.clock.views.TimeZoneView"
+            inject="true"
+            name="Time Zone View"
+            restorable="true">
+      </view>
+      <category
+            id="com.ui.plugin.clock"
+            name="Time Zone Tree">
+      </category>
+      <view
+            category="com.ui.plugin.clock"
+            class="com.ui.plugin.clock.views.TimeZoneTreeView"
+            icon="icons/sample.png"
+            id="com.ui.plugin.clock.views.TimeZoneTreeView"
+            inject="true"
+            restorable="true"
+            name="Time Zone Tree View">
+      </view>
+
    </extension>
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
@@ -28,9 +56,36 @@
                ratio="0.5">
          </view>
       </perspectiveExtension>
+
+      <perspectiveExtension
+            targetID="org.eclipse.jdt.ui.JavaPerspective">
+         <view
+               id="com.ui.plugin.clock.views.TimeZoneView"
+               ratio="0.5"
+               relationship="right"
+               relative="org.eclipse.ui.views.ProblemView">
+         </view>
+      </perspectiveExtension>
+      <perspectiveExtension
+            targetID="org.eclipse.jdt.ui.JavaPerspective">
+         <view
+               id="com.ui.plugin.clock.views.clock.ui.plugin.clock.views.TimeZoneTreeView"
+               ratio="0.5"
+               relationship="right"
+               relative="org.eclipse.ui.views.ProblemView">
+         </view>
+      </perspectiveExtension>
+
    </extension>
    <extension
          point="org.eclipse.help.contexts">
+      <contexts
+            file="contexts.xml">
+      </contexts>
+
+      <contexts
+            file="contexts.xml">
+      </contexts>
       <contexts
             file="contexts.xml">
       </contexts>
