@@ -18,8 +18,8 @@ import org.eclipse.swt.widgets.Shell;
 
 public class ClockWidget extends Canvas {
 
-	private final Color color;	
-	private ZoneId zone = ZoneId.systemDefault();
+	private Color color;	
+	private ZoneId zone;
 	
 	private ClockWidget(Composite parent, int style) {
 		super(parent, style);
@@ -27,9 +27,10 @@ public class ClockWidget extends Canvas {
 		this.color = new Color(parent.getDisplay(), rgb);
 	}
 	
-	private ClockWidget(Composite parent, int style,final RGB rgb) {
-		super(parent, style);
+	private ClockWidget(Composite parent, int style,final RGB rgb, final ZoneId zone) {
+		this(parent, style);
 		this.color = new Color(parent.getDisplay(),rgb);
+		this.zone = zone;
 	}
 
 	public void initPaintListener() {
@@ -118,6 +119,7 @@ public class ClockWidget extends Canvas {
 		
 		private Composite parent;
 		private int style;
+		private ZoneId zone;
 
 		private RGB rgb;
 		
@@ -134,10 +136,15 @@ public class ClockWidget extends Canvas {
 		public ClockWidgetBuilder color(final RGB rgb) {
 			this.rgb = rgb;
 			return this;
-    }
+		}
+		
+		public ClockWidgetBuilder zone(final ZoneId zone) {
+			this.zone = zone;
+			return this;
+		}
         
 		public ClockWidget build() {
-			return new ClockWidget(this.parent,this.style,this.rgb);
+			return new ClockWidget(this.parent,this.style,this.rgb,this.zone);
 		}
 
 		public ClockWidgetBuilder shell(final Shell shell) {

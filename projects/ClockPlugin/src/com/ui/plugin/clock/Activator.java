@@ -1,6 +1,7 @@
 package com.ui.plugin.clock;
 
 import java.io.InputStream;
+import java.time.ZoneId;
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -144,6 +145,7 @@ public class Activator extends AbstractUIPlugin {
 					.shell(shell)
 					.style(SWT.NONE)
 					.color(new RGB(255, 0, 255))
+					.zone(ZoneId.systemDefault())
 					.build();
 				
 				clock.initDisposeListener();
