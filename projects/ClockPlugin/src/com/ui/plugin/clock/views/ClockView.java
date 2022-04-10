@@ -57,7 +57,7 @@ public class ClockView extends ViewPart {
 		ZoneId.getAvailableZoneIds()
 		.stream()
 		.forEach(this.timeZones::add);
-
+		
 		final RowLayout layout = new RowLayout(SWT.HORIZONTAL);
 		parent.setLayout(layout);
 

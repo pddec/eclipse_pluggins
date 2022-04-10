@@ -1,17 +1,39 @@
 package com.ui.plugin.clock.views;
 
+
+import java.net.URL;
+import java.time.Instant;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 
 import org.eclipse.e4.ui.di.Focus;
+import org.eclipse.jface.resource.FontRegistry;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.resource.LocalResourceManager;
+import org.eclipse.jface.resource.ResourceManager;
+import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
+import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
+import org.eclipse.jface.viewers.IFontProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.part.ViewPart;
 
 /**
@@ -37,24 +59,52 @@ public class TimeZoneTreeView extends ViewPart {
 	public static final String ID = "TimeZoneTreeView";
 
 	private TreeViewer treeViewer;
+
+
+	@Inject
+	private ISharedImages images;
+
+
 	
 	@Override
 	public void createPartControl(Composite parent) {}
 
+
 	@PostConstruct
 	public void create(Composite parent) {
 		final TreeViewer treeViewer = new TreeViewer(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.MULTI);
-		treeViewer.setLabelProvider(new TimeZoneLabelProvider());
+
+
+		final ResourceManager rm = JFaceResources.getResources();
+		final LocalResourceManager lrm = new LocalResourceManager(rm, parent);
+
 		treeViewer.setContentProvider(new TimeZoneContentProvider());
-		treeViewer.setInput(new Object[]{TimeZoneView.getTimeZones()}); 
-		
+		treeViewer.setInput(new Object[] { TimeZoneView.getTimeZones() });
+
+		final ImageRegistry ir = new ImageRegistry(lrm);
+		final URL sample = this.getClass().getResource("/icons/sample.gif");
+		ir.put("sample", ImageDescriptor.createFromURL(sample));
+
+		final FontRegistry fr = JFaceResources.getFontRegistry();
+
+		final TimeZoneLabelProvider labelProvider = new TimeZoneLabelProvider(this.images, ir, fr);
+		final DelegatingStyledCellLabelProvider delegatingStyled = new DelegatingStyledCellLabelProvider(labelProvider);
+
+		treeViewer.setLabelProvider(delegatingStyled);
+		treeViewer.setData("REVERSE", Boolean.TRUE);
+		treeViewer.setComparator(new TimeZoneViewerComparator());
+	
 		this.treeViewer = treeViewer;
 	}
 
 	@Focus
 	public void focus() {
-	  this.treeViewer.getControl().setFocus();
+
+		this.treeViewer.getControl().setFocus();
 	}
+
+	public class TimeZoneContentProvider implements ITreeContentProvider {
+
 	
 	public class TimeZoneContentProvider implements ITreeContentProvider{
 		@Override
@@ -68,9 +118,8 @@ public class TimeZoneTreeView extends ViewPart {
 
 			if (parentElement instanceof Collection)
 				return ((Collection) parentElement).toArray();
-			
-			return new Object[0];
 
+			return new Object[0];
 		}
 
 		@Override
@@ -99,10 +148,27 @@ public class TimeZoneTreeView extends ViewPart {
 
 			return false;
 		}
-		
 	}
 
-	public class TimeZoneLabelProvider extends LabelProvider  {
+	public class TimeZoneLabelProvider extends LabelProvider implements IStyledLabelProvider, IFontProvider {
+
+		private final ISharedImages images;
+		private final FontRegistry fr;
+
+		private ImageRegistry ir;
+
+		public TimeZoneLabelProvider(ISharedImages images, ImageRegistry ir, FontRegistry fr) {
+			this.images = images;
+			this.ir = ir;
+			this.fr = fr;
+		}
+
+		public Font getFont(Object element) {
+			final Font italic = this.fr.getItalic(JFaceResources.DEFAULT_FONT);
+			return italic;
+		}
+
+
 		@SuppressWarnings("rawtypes")
 		public String getText(Object element) {
 			if (element instanceof Map)
@@ -118,12 +184,69 @@ public class TimeZoneTreeView extends ViewPart {
 
 		}
 
+		public StyledString getStyledText(Object element) {
+			final String text = getText(element);
+			final StyledString styledString = new StyledString(text);
+			final boolean instance = element instanceof ZoneId;
+
+			if (instance) {
+				final ZoneId zone = (ZoneId) element;
+				final ZoneOffset offset = ZonedDateTime.now(zone).getOffset();
+				styledString.append(" (" + offset + ")", StyledString.DECORATIONS_STYLER);
+			}
+
+			return styledString;
+		}
+
+		public Image getImage(Object element) {
+			if (element instanceof Map.Entry)
+				return this.images.getImage(ISharedImages.IMG_OBJ_FOLDER);
+
+			if (element instanceof ZoneId)
+				return this.ir.get("sample");
+
+			return super.getImage(element);
+		}
+	}
+
+	public class TimeZoneViewerComparator extends ViewerComparator {
+
+		public int compare(Viewer viewer, Object z1, Object z2) {
+
+			final Supplier<Integer> compareTo = () -> {
+
+				final boolean z1Instance = z1 instanceof ZoneId;
+				final boolean z2Instance = z2 instanceof ZoneId;
+
+				if (!z1Instance && !z2Instance)
+					return z1.toString().compareTo(z2.toString());
+
+				final Instant now = Instant.now();
+				final ZonedDateTime zdt1 = ZonedDateTime.ofInstant(now, (ZoneId) z1);
+				final ZonedDateTime zdt2 = ZonedDateTime.ofInstant(now, (ZoneId) z2);
+				return zdt1.compareTo(zdt2);
+			};
+
+			final int compare = compareTo.get();
+			final String data = String.valueOf(viewer.getData("REVERSE"));
+			final boolean reverse = Boolean.parseBoolean(data);
+
+			if (reverse) return -compare;
+			
+			return compare;
+
+		}
+
+
+		}
+
 		
+
 	}
 
 	@Override
 	public void setFocus() {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

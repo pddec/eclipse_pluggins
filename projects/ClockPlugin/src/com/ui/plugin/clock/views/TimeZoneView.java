@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -66,7 +67,8 @@ public class TimeZoneView extends ViewPart {
 			scrolled.setExpandHorizontal(true);
 			scrolled.setExpandVertical(true);
 			
-			final Color systemColor = clocks.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND);
+			final Color systemColor = clocks.getDisplay()
+					.getSystemColor(SWT.COLOR_LIST_BACKGROUND);
 			
 			clocks.setBackground(systemColor);
 			
@@ -74,24 +76,30 @@ public class TimeZoneView extends ViewPart {
 			item.setText(region);
 
 			final RGB rgb = new RGB(128, 128, 128);
-			zones.forEach(zone -> {
-				
-				final Group group = new Group(clocks, SWT.SHADOW_ETCHED_IN);
-				group.setText(zone.getId().split("/")[1]);
-				group.setLayout(new FillLayout());
-
-				final ClockWidget clock = ClockWidget.builder()
-						.parent(group)
-						.style(SWT.NONE)
-						.color(rgb)
-						.zone(zone)
-						.build();
-				
-				clock.initDisposeListener();
-				clock.initPaintListener();
-			});
+			zones.forEach(TimeZoneView.eachZone(rgb, clocks));
 		};
 	}
+	
+	private static Consumer<ZoneId> eachZone(final RGB rgb, final Composite clocks){
+		return zone -> {
+			
+			final Group group = new Group(clocks, SWT.SHADOW_ETCHED_IN);
+			group.setText(zone.getId().split("/")[1]);
+			group.setLayout(new FillLayout());
+
+			final ClockWidget clock = ClockWidget.builder()
+					.parent(group)
+					.style(SWT.NONE)
+					.color(rgb)
+					.zone(zone)
+					.build();
+			
+			clock.initDisposeListener();
+			clock.initPaintListener();
+		};
+		
+	}
+
 
 
 	private static Comparator<ZoneId> comparator() {
