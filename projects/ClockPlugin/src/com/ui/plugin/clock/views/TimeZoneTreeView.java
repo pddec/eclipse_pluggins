@@ -273,7 +273,7 @@ public class TimeZoneTreeView extends ViewPart {
 		}
 
 		public StyledString getStyledText(Object element) {
-			final String text = getText(element);
+			final String text = this.getText(element);
 			final StyledString styledString = new StyledString(text);
 			final boolean instance = element instanceof ZoneId;
 
