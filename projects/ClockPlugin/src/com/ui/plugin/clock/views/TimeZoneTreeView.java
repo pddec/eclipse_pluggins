@@ -1,5 +1,6 @@
 package com.ui.plugin.clock.views;
 
+
 import java.net.URL;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -59,16 +60,20 @@ public class TimeZoneTreeView extends ViewPart {
 
 	private TreeViewer treeViewer;
 
+
 	@Inject
 	private ISharedImages images;
 
+
+	
 	@Override
-	public void createPartControl(Composite parent) {
-	}
+	public void createPartControl(Composite parent) {}
+
 
 	@PostConstruct
 	public void create(Composite parent) {
 		final TreeViewer treeViewer = new TreeViewer(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.MULTI);
+
 
 		final ResourceManager rm = JFaceResources.getResources();
 		final LocalResourceManager lrm = new LocalResourceManager(rm, parent);
@@ -88,16 +93,20 @@ public class TimeZoneTreeView extends ViewPart {
 		treeViewer.setLabelProvider(delegatingStyled);
 		treeViewer.setData("REVERSE", Boolean.TRUE);
 		treeViewer.setComparator(new TimeZoneViewerComparator());
-
+	
 		this.treeViewer = treeViewer;
 	}
 
 	@Focus
 	public void focus() {
+
 		this.treeViewer.getControl().setFocus();
 	}
 
 	public class TimeZoneContentProvider implements ITreeContentProvider {
+
+	
+	public class TimeZoneContentProvider implements ITreeContentProvider{
 		@Override
 		@SuppressWarnings("rawtypes")
 		public Object[] getChildren(Object parentElement) {
@@ -139,7 +148,6 @@ public class TimeZoneTreeView extends ViewPart {
 
 			return false;
 		}
-
 	}
 
 	public class TimeZoneLabelProvider extends LabelProvider implements IStyledLabelProvider, IFontProvider {
@@ -160,9 +168,9 @@ public class TimeZoneTreeView extends ViewPart {
 			return italic;
 		}
 
+
 		@SuppressWarnings("rawtypes")
 		public String getText(Object element) {
-
 			if (element instanceof Map)
 				return "Time Zones";
 
@@ -173,6 +181,7 @@ public class TimeZoneTreeView extends ViewPart {
 				return ((ZoneId) element).getId().split("/")[1];
 
 			return "Unknown type: " + element.getClass();
+
 		}
 
 		public StyledString getStyledText(Object element) {
@@ -227,6 +236,12 @@ public class TimeZoneTreeView extends ViewPart {
 			return compare;
 
 		}
+
+
+		}
+
+		
+
 	}
 
 	@Override

@@ -15,6 +15,7 @@
             category="ClockPlugin"
             inject="true">
       </view>
+
       <category
             id="TimeZoneView"
             name="TimeZone Keeper">
@@ -41,6 +42,7 @@
             restorable="true"
             name="Time Zone Tree View">
       </view>
+
    </extension>
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
