@@ -9,7 +9,5 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Automatic-Module-Name: ClockPlugin
-Import-Package: javax.annotation;version="1.3.5",
- javax.inject,
- org.eclipse.e4.ui.di
+Import-Package: javax.inject
 Bundle-ActivationPolicy: lazy
