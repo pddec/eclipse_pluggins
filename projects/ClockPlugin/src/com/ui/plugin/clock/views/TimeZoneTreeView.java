@@ -1,11 +1,9 @@
 package com.ui.plugin.clock.views;
 
-
 import java.net.URL;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.util.Locale;
+import java.time.*;
+import java.time.format.TextStyle;
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -29,6 +27,7 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
@@ -60,20 +59,16 @@ public class TimeZoneTreeView extends ViewPart {
 
 	private TreeViewer treeViewer;
 
-
 	@Inject
 	private ISharedImages images;
 
-
-	
 	@Override
-	public void createPartControl(Composite parent) {}
-
+	public void createPartControl(Composite parent) {
+	}
 
 	@PostConstruct
 	public void create(Composite parent) {
 		final TreeViewer treeViewer = new TreeViewer(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.MULTI);
-
 
 		final ResourceManager rm = JFaceResources.getResources();
 		final LocalResourceManager lrm = new LocalResourceManager(rm, parent);
@@ -93,7 +88,9 @@ public class TimeZoneTreeView extends ViewPart {
 		treeViewer.setLabelProvider(delegatingStyled);
 		treeViewer.setData("REVERSE", Boolean.TRUE);
 		treeViewer.setComparator(new TimeZoneViewerComparator());
-	
+		treeViewer.setExpandPreCheckFilters(true);
+		treeViewer.setFilters(new ViewerFilter[] {new TimeZoneViewerFilter("GMT")});
+
 		this.treeViewer = treeViewer;
 	}
 
@@ -103,7 +100,7 @@ public class TimeZoneTreeView extends ViewPart {
 		this.treeViewer.getControl().setFocus();
 	}
 
-	public class TimeZoneContentProvider implements ITreeContentProvider{
+	public class TimeZoneContentProvider implements ITreeContentProvider {
 		@Override
 		@SuppressWarnings("rawtypes")
 		public Object[] getChildren(Object parentElement) {
@@ -164,7 +161,6 @@ public class TimeZoneTreeView extends ViewPart {
 			final Font italic = this.fr.getItalic(JFaceResources.DEFAULT_FONT);
 			return italic;
 		}
-
 
 		@SuppressWarnings("rawtypes")
 		public String getText(Object element) {
@@ -228,9 +224,32 @@ public class TimeZoneTreeView extends ViewPart {
 			final String data = String.valueOf(viewer.getData("REVERSE"));
 			final boolean reverse = Boolean.parseBoolean(data);
 
-			if (reverse) return -compare;
-			
+			if (reverse)
+				return -compare;
+
 			return compare;
+
+		}
+	}
+
+	public class TimeZoneViewerFilter extends ViewerFilter {
+		private String pattern;
+
+		public TimeZoneViewerFilter(String pattern) {
+			this.pattern = pattern;
+		}
+
+		public boolean select(Viewer v, Object parent, Object element) {
+			final boolean zoneInstance = element instanceof ZoneId;
+
+			if (!zoneInstance) return true;
+			
+			final ZoneId zone = (ZoneId) element;
+			final Locale locale = Locale.getDefault();
+		
+			final String displayName = zone.getDisplayName(TextStyle.FULL, locale);
+			
+			return displayName.contains(this.pattern);
 
 		}
 	}
