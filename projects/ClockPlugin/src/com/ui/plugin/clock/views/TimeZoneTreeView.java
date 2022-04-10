@@ -9,6 +9,7 @@ import java.time.format.TextStyle;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Supplier;
@@ -16,7 +17,9 @@ import java.util.function.Supplier;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.Focus;
+import org.eclipse.e4.ui.workbench.modeling.ESelectionService;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.FontRegistry;
@@ -30,6 +33,7 @@ import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelP
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IFontProvider;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -77,8 +81,16 @@ public class TimeZoneTreeView extends ViewPart {
 	@Inject
 	private ISharedImages images;
 
+	@Inject
+	@Optional
+	private ESelectionService selectionService;
+
 	@Override
 	public void createPartControl(Composite parent) {
+	}
+	
+	public boolean hasSelectionService() {
+		return Objects.nonNull(this.selectionService);
 	}
 
 	@PostConstruct
@@ -91,11 +103,13 @@ public class TimeZoneTreeView extends ViewPart {
 		treeViewer.setLabelProvider(TimeZoneTreeView.delegatingStyled(parent, this));
 		treeViewer.setData("REVERSE", Boolean.TRUE);
 		treeViewer.setComparator(new TimeZoneViewerComparator());
-		
+
 		treeViewer.setFilters(new ViewerFilter[] { new TimeZoneViewerFilter("GMT") });
 		treeViewer.setExpandPreCheckFilters(true);
 
 		treeViewer.addDoubleClickListener(TimeZoneTreeView.doubleClickListener());
+
+		treeViewer.addSelectionChangedListener(TimeZoneTreeView.selectionChangedListener(this));
 
 		this.treeViewer = treeViewer;
 	}
@@ -123,7 +137,24 @@ public class TimeZoneTreeView extends ViewPart {
 		return new DelegatingStyledCellLabelProvider(labelProvider);
 
 	}
+	
+	private static ISelectionChangedListener selectionChangedListener(final TimeZoneTreeView that) {
 
+		return event -> {
+			// forward selection
+			final Object selection = ((IStructuredSelection) event.getSelection())
+					.getFirstElement();
+			
+			final boolean nullableSelection = Objects.nonNull(selection);
+			
+			if (!nullableSelection && !that.hasSelectionService()) 
+				return;
+			
+			that.selectionService.setSelection(selection);
+		};
+
+	}
+	
 	private static IDoubleClickListener doubleClickListener() {
 
 		return event -> {
@@ -164,32 +195,25 @@ public class TimeZoneTreeView extends ViewPart {
 		public TimeZoneDialog(Shell parentShell, ZoneId timeZone) {
 
 			super(parentShell, timeZone.getId(), null,
-					new StringBuilder("Time Zone ")
-					.append(timeZone.getId())
-					.toString(), 
-					MessageDialog.INFORMATION,
+					new StringBuilder("Time Zone ").append(timeZone.getId()).toString(), MessageDialog.INFORMATION,
 					new String[] { IDialogConstants.OK_LABEL }, 0);
-			
+
 			this.timeZone = timeZone;
 		}
 
 		protected Control createCustomArea(Composite parent) {
-			final ClockWidget clock = ClockWidget.builder()
-					.parent(parent)
-					.style(SWT.NONE)
-					.zone(this.timeZone)
-					.color(new RGB(128, 255, 0))
-					.build();
-			
+			final ClockWidget clock = ClockWidget.builder().parent(parent).style(SWT.NONE).zone(this.timeZone)
+					.color(new RGB(128, 255, 0)).build();
+
 			clock.initDisposeListener();
 			clock.initPaintListener();
-			
+
 			final Runnable runner = ClockWidget.moveSecondHand(clock);
-			
+
 			final ExecutorService singleExecutor = Executors.newSingleThreadExecutor(ClockView.clockFactory());
-			
+
 			singleExecutor.execute(runner);
-			
+
 			return parent;
 		}
 

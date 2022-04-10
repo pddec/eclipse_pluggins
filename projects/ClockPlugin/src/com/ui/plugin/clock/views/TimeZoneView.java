@@ -28,6 +28,8 @@ import org.eclipse.ui.part.ViewPart;
 import com.ui.plugin.clock.widget.ClockWidget;
 
 public class TimeZoneView extends ViewPart {
+	
+	
 
 	public void createPartControl(Composite parent) {
 		final Map<String, Set<ZoneId>> timeZones = TimeZoneView.getTimeZones();
