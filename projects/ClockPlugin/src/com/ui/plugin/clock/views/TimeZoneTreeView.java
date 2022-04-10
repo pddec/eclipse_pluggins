@@ -103,9 +103,6 @@ public class TimeZoneTreeView extends ViewPart {
 		this.treeViewer.getControl().setFocus();
 	}
 
-	public class TimeZoneContentProvider implements ITreeContentProvider {
-
-	
 	public class TimeZoneContentProvider implements ITreeContentProvider{
 		@Override
 		@SuppressWarnings("rawtypes")
@@ -236,12 +233,6 @@ public class TimeZoneTreeView extends ViewPart {
 			return compare;
 
 		}
-
-
-		}
-
-		
-
 	}
 
 	@Override
