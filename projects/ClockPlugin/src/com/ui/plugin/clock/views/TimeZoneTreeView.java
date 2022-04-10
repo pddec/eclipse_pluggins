@@ -1,10 +1,13 @@
 package com.ui.plugin.clock.views;
 
 import java.net.URL;
-import java.util.Locale;
-import java.time.*;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.format.TextStyle;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -12,6 +15,8 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
 import org.eclipse.e4.ui.di.Focus;
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.FontRegistry;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
@@ -42,9 +47,6 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.part.ViewPart;
 
 import com.ui.plugin.clock.widget.ClockWidget;
-
-import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.MessageDialog;
 
 /**
  * This sample class demonstrates how to plug-in a new workbench view. The view
@@ -139,17 +141,20 @@ public class TimeZoneTreeView extends ViewPart {
 
 			final Object selectedValue = selection.get();
 
-			if (selectedValue instanceof ZoneId) {
-				final ZoneId timeZone = (ZoneId) selectedValue;
-				MessageDialog.openInformation(shell, timeZone.getId(), timeZone.toString());
-			}
+			final boolean selectionZone = selectedValue instanceof ZoneId;
 
-			MessageDialog.openInformation(shell, "Double click", "Double click detected");
+			if (!selectionZone) return;
+			
+			final ZoneId timeZone = (ZoneId) selectedValue;
+			final TimeZoneDialog timeZoneDialog = new TimeZoneDialog(shell, timeZone);
+
+			timeZoneDialog.open();
+
 		};
 
 	}
 
-	public class TimeZoneDialog extends MessageDialog {
+	public static class TimeZoneDialog extends MessageDialog {
 		private ZoneId timeZone;
 
 		public TimeZoneDialog(Shell parentShell, ZoneId timeZone) {
@@ -157,18 +162,15 @@ public class TimeZoneTreeView extends ViewPart {
 					new String[] { IDialogConstants.OK_LABEL }, 0);
 			this.timeZone = timeZone;
 		}
-		
-		protected Control createCustomArea(Composite parent) {
-			  final ClockWidget clock = ClockWidget.builder()
-					  .parent(parent)
-					  .style(SWT.NONE)
-					  .zone(this.timeZone)
-					  .color(new RGB(128,255,0))
-					  .build();
-			  return parent;
-			}
 
-		
+		protected Control createCustomArea(Composite parent) {
+			final ClockWidget clock = ClockWidget
+					.builder().parent(parent)
+					.style(SWT.NONE).zone(this.timeZone)
+					.color(new RGB(128, 255, 0)).build();
+			return parent;
+		}
+
 	}
 
 	public class TimeZoneContentProvider implements ITreeContentProvider {
