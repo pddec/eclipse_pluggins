@@ -6,9 +6,12 @@ import javax.annotation.PostConstruct;
 
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.part.ViewPart;
 
 /**
@@ -36,14 +39,22 @@ public class TimeZoneTableView extends ViewPart {
 	private TableViewer tableViewer;
 
 	@Override
-	public void createPartControl(Composite parent) {}
+	public void createPartControl(Composite parent) {
+	}
 
 	@PostConstruct
 	public void create(Composite parent) {
 		final TableViewer tableViewer = new TableViewer(parent, SWT.H_SCROLL | SWT.V_SCROLL);
 		tableViewer.getTable().setHeaderVisible(true);
 		tableViewer.setContentProvider(ArrayContentProvider.getInstance());
-		tableViewer.setInput(ZoneId.getAvailableZoneIds());
+		
+		final TimeZoneIDColumn idColumn = new TimeZoneIDColumn();
+		
+		idColumn.addColumnTo(tableViewer);
+
+		final Object[] array = ZoneId.getAvailableZoneIds().stream().map(ZoneId::of).toArray();
+
+		tableViewer.setInput(array);
 
 		this.tableViewer = tableViewer;
 	}
@@ -54,5 +65,46 @@ public class TimeZoneTableView extends ViewPart {
 	}
 
 	@Override
-	public void setFocus() {}
+	public void setFocus() {
+	}
+
+	public abstract class TimeZoneColumn extends ColumnLabelProvider {
+		public abstract String getText(Object element);
+
+		public abstract String getTitle();
+
+		public int getWidth() {
+			return 250;
+		}
+
+		public int getAlignment() {
+			return SWT.LEFT;
+		}
+
+		public TableViewerColumn addColumnTo(TableViewer viewer) {
+			final TableViewerColumn tableViewerColumn = new TableViewerColumn(viewer, SWT.NONE);
+			final TableColumn column = tableViewerColumn.getColumn();
+			column.setMoveable(true);
+			column.setResizable(true);
+			column.setText(getTitle());
+			column.setWidth(getWidth());
+			column.setAlignment(getAlignment());
+			tableViewerColumn.setLabelProvider(this);
+			return tableViewerColumn;
+		}
+	}
+
+	public class TimeZoneIDColumn extends TimeZoneColumn {
+		public String getText(Object element) {
+			if (element instanceof ZoneId) {
+				return ((ZoneId) element).getId();
+			} else {
+				return "";
+			}
+		}
+
+		public String getTitle() {
+			return "ID";
+		}
+	}
 }
