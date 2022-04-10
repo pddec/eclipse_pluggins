@@ -20,7 +20,10 @@ import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.resource.ResourceManager;
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IFontProvider;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StyledString;
@@ -31,9 +34,17 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.part.ViewPart;
+
+import com.ui.plugin.clock.widget.ClockWidget;
+
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.MessageDialog;
 
 /**
  * This sample class demonstrates how to plug-in a new workbench view. The view
@@ -70,26 +81,16 @@ public class TimeZoneTreeView extends ViewPart {
 	public void create(Composite parent) {
 		final TreeViewer treeViewer = new TreeViewer(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.MULTI);
 
-		final ResourceManager rm = JFaceResources.getResources();
-		final LocalResourceManager lrm = new LocalResourceManager(rm, parent);
-
 		treeViewer.setContentProvider(new TimeZoneContentProvider());
 		treeViewer.setInput(new Object[] { TimeZoneView.getTimeZones() });
 
-		final ImageRegistry ir = new ImageRegistry(lrm);
-		final URL sample = this.getClass().getResource("/icons/sample.gif");
-		ir.put("sample", ImageDescriptor.createFromURL(sample));
-
-		final FontRegistry fr = JFaceResources.getFontRegistry();
-
-		final TimeZoneLabelProvider labelProvider = new TimeZoneLabelProvider(this.images, ir, fr);
-		final DelegatingStyledCellLabelProvider delegatingStyled = new DelegatingStyledCellLabelProvider(labelProvider);
-
-		treeViewer.setLabelProvider(delegatingStyled);
+		treeViewer.setLabelProvider(TimeZoneTreeView.delegatingStyled(parent, this));
 		treeViewer.setData("REVERSE", Boolean.TRUE);
 		treeViewer.setComparator(new TimeZoneViewerComparator());
 		treeViewer.setExpandPreCheckFilters(true);
-		treeViewer.setFilters(new ViewerFilter[] {new TimeZoneViewerFilter("GMT")});
+		treeViewer.setFilters(new ViewerFilter[] { new TimeZoneViewerFilter("GMT") });
+
+		treeViewer.addDoubleClickListener(TimeZoneTreeView.doubleClickListener());
 
 		this.treeViewer = treeViewer;
 	}
@@ -98,6 +99,76 @@ public class TimeZoneTreeView extends ViewPart {
 	public void focus() {
 
 		this.treeViewer.getControl().setFocus();
+	}
+
+	private static DelegatingStyledCellLabelProvider delegatingStyled(final Composite parent,
+			final TimeZoneTreeView that) {
+
+		final ResourceManager rm = JFaceResources.getResources();
+		final LocalResourceManager lrm = new LocalResourceManager(rm, parent);
+
+		final ImageRegistry ir = new ImageRegistry(lrm);
+		final URL sample = that.getClass().getResource("/icons/sample.gif");
+		ir.put("sample", ImageDescriptor.createFromURL(sample));
+
+		final FontRegistry fr = JFaceResources.getFontRegistry();
+
+		final TimeZoneLabelProvider labelProvider = new TimeZoneLabelProvider(that.images, ir, fr);
+
+		return new DelegatingStyledCellLabelProvider(labelProvider);
+
+	}
+
+	private static IDoubleClickListener doubleClickListener() {
+
+		return event -> {
+			final Viewer viewer = event.getViewer();
+			final Shell shell = viewer.getControl().getShell();
+			final ISelection sel = viewer.getSelection();
+
+			final Supplier<Object> selection = () -> {
+
+				final boolean selectionInstance = sel instanceof IStructuredSelection;
+
+				if (!selectionInstance || sel.isEmpty())
+					return null;
+
+				return ((IStructuredSelection) sel).getFirstElement();
+
+			};
+
+			final Object selectedValue = selection.get();
+
+			if (selectedValue instanceof ZoneId) {
+				final ZoneId timeZone = (ZoneId) selectedValue;
+				MessageDialog.openInformation(shell, timeZone.getId(), timeZone.toString());
+			}
+
+			MessageDialog.openInformation(shell, "Double click", "Double click detected");
+		};
+
+	}
+
+	public class TimeZoneDialog extends MessageDialog {
+		private ZoneId timeZone;
+
+		public TimeZoneDialog(Shell parentShell, ZoneId timeZone) {
+			super(parentShell, timeZone.getId(), null, "Time Zone " + timeZone.getId(), INFORMATION,
+					new String[] { IDialogConstants.OK_LABEL }, 0);
+			this.timeZone = timeZone;
+		}
+		
+		protected Control createCustomArea(Composite parent) {
+			  final ClockWidget clock = ClockWidget.builder()
+					  .parent(parent)
+					  .style(SWT.NONE)
+					  .zone(this.timeZone)
+					  .color(new RGB(128,255,0))
+					  .build();
+			  return parent;
+			}
+
+		
 	}
 
 	public class TimeZoneContentProvider implements ITreeContentProvider {
@@ -144,7 +215,7 @@ public class TimeZoneTreeView extends ViewPart {
 		}
 	}
 
-	public class TimeZoneLabelProvider extends LabelProvider implements IStyledLabelProvider, IFontProvider {
+	public static class TimeZoneLabelProvider extends LabelProvider implements IStyledLabelProvider, IFontProvider {
 
 		private final ISharedImages images;
 		private final FontRegistry fr;
@@ -242,13 +313,14 @@ public class TimeZoneTreeView extends ViewPart {
 		public boolean select(Viewer v, Object parent, Object element) {
 			final boolean zoneInstance = element instanceof ZoneId;
 
-			if (!zoneInstance) return true;
-			
+			if (!zoneInstance)
+				return true;
+
 			final ZoneId zone = (ZoneId) element;
 			final Locale locale = Locale.getDefault();
-		
+
 			final String displayName = zone.getDisplayName(TextStyle.FULL, locale);
-			
+
 			return displayName.contains(this.pattern);
 
 		}
