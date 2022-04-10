@@ -48,7 +48,8 @@ public class Activator extends AbstractUIPlugin {
 		Activator.plugin = this;
 
 		final Display display = Display.getDefault();
-		final Runnable runner = Activator.trayRunner(this).apply(display);
+		final Runnable runner = Activator.trayRunner(this)
+				.apply(display);
 
 		display.asyncExec(runner);
 

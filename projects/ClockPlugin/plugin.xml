@@ -42,6 +42,18 @@
             restorable="true"
             name="Time Zone Tree View">
       </view>
+      <category
+            id="TimeZoneTableView"
+            name="Time Zone Table View">
+      </category>
+      <view
+            category="TimeZoneTableView"
+            class="com.ui.plugin.clock.views.TimeZoneTableView"
+            icon="icons/sample.png"
+            id="com.ui.plugin.clock.TimeZoneTableView"
+            inject="true"
+            name="TimeZoneTableView">
+      </view>
 
    </extension>
    <extension
@@ -75,6 +87,15 @@
                relative="org.eclipse.ui.views.ProblemView">
          </view>
       </perspectiveExtension>
+      <perspectiveExtension
+            targetID="org.eclipse.jdt.ui.JavaPerspective">
+         <view
+               id="com.ui.plugin.clock.TimeZoneTableView"
+               ratio="0.5"
+               relationship="right"
+               relative="org.eclipse.ui.views.ProblemView">
+         </view>
+      </perspectiveExtension>
 
    </extension>
    <extension
@@ -88,6 +109,9 @@
             file="contexts.xml">
       </contexts>
 
+      <contexts
+            file="contexts.xml">
+      </contexts>
       <contexts
             file="contexts.xml">
       </contexts>

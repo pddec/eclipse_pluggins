@@ -106,9 +106,9 @@ public class ClockView extends ViewPart {
 
 		final ExecutorService services = Executors.newFixedThreadPool(3, ClockView.clockFactory());
 
-		services.submit(runnerClock1);
-		services.submit(runnerClock2);
-		services.submit(runnerClock3);
+		services.execute(runnerClock1);
+		services.execute(runnerClock2);
+		services.execute(runnerClock3);
 
 		final SelectionListener timeZoneClock3 = ClockView.timeZoneListener(this)
 				.apply(clockWidget3);
@@ -135,7 +135,7 @@ public class ClockView extends ViewPart {
 		};
 	}
 
-	private static ThreadFactory clockFactory() {
+	public static ThreadFactory clockFactory() {
 		return (final Runnable runClock) -> {
 			final Thread runner = new Thread(runClock, "Tick Tack");
 			runner.setUncaughtExceptionHandler((thread, exception) -> {
