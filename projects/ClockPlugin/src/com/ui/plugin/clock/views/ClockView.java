@@ -135,7 +135,7 @@ public class ClockView extends ViewPart {
 		};
 	}
 
-	private static ThreadFactory clockFactory() {
+	public static ThreadFactory clockFactory() {
 		return (final Runnable runClock) -> {
 			final Thread runner = new Thread(runClock, "Tick Tack");
 			runner.setUncaughtExceptionHandler((thread, exception) -> {

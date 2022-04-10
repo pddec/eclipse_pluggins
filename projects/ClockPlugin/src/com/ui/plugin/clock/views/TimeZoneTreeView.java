@@ -9,6 +9,8 @@ import java.time.format.TextStyle;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Supplier;
 
 import javax.annotation.PostConstruct;
@@ -89,8 +91,9 @@ public class TimeZoneTreeView extends ViewPart {
 		treeViewer.setLabelProvider(TimeZoneTreeView.delegatingStyled(parent, this));
 		treeViewer.setData("REVERSE", Boolean.TRUE);
 		treeViewer.setComparator(new TimeZoneViewerComparator());
-		treeViewer.setExpandPreCheckFilters(true);
+		
 		treeViewer.setFilters(new ViewerFilter[] { new TimeZoneViewerFilter("GMT") });
+		treeViewer.setExpandPreCheckFilters(true);
 
 		treeViewer.addDoubleClickListener(TimeZoneTreeView.doubleClickListener());
 
@@ -143,12 +146,13 @@ public class TimeZoneTreeView extends ViewPart {
 
 			final boolean selectionZone = selectedValue instanceof ZoneId;
 
-			if (!selectionZone) return;
-			
-			final ZoneId timeZone = (ZoneId) selectedValue;
-			final TimeZoneDialog timeZoneDialog = new TimeZoneDialog(shell, timeZone);
+			if (selectionZone) {
 
-			timeZoneDialog.open();
+				final ZoneId timeZone = (ZoneId) selectedValue;
+				final TimeZoneDialog timeZoneDialog = new TimeZoneDialog(shell, timeZone);
+
+				timeZoneDialog.open();
+			}
 
 		};
 
@@ -158,16 +162,34 @@ public class TimeZoneTreeView extends ViewPart {
 		private ZoneId timeZone;
 
 		public TimeZoneDialog(Shell parentShell, ZoneId timeZone) {
-			super(parentShell, timeZone.getId(), null, "Time Zone " + timeZone.getId(), INFORMATION,
+
+			super(parentShell, timeZone.getId(), null,
+					new StringBuilder("Time Zone ")
+					.append(timeZone.getId())
+					.toString(), 
+					MessageDialog.INFORMATION,
 					new String[] { IDialogConstants.OK_LABEL }, 0);
+			
 			this.timeZone = timeZone;
 		}
 
 		protected Control createCustomArea(Composite parent) {
-			final ClockWidget clock = ClockWidget
-					.builder().parent(parent)
-					.style(SWT.NONE).zone(this.timeZone)
-					.color(new RGB(128, 255, 0)).build();
+			final ClockWidget clock = ClockWidget.builder()
+					.parent(parent)
+					.style(SWT.NONE)
+					.zone(this.timeZone)
+					.color(new RGB(128, 255, 0))
+					.build();
+			
+			clock.initDisposeListener();
+			clock.initPaintListener();
+			
+			final Runnable runner = ClockWidget.moveSecondHand(clock);
+			
+			final ExecutorService singleExecutor = Executors.newSingleThreadExecutor(ClockView.clockFactory());
+			
+			singleExecutor.execute(runner);
+			
 			return parent;
 		}
 
