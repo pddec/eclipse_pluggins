@@ -7,6 +7,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -85,6 +86,7 @@ public class TimeZoneTreeView extends ViewPart {
 		final DelegatingStyledCellLabelProvider delegatingStyled = new DelegatingStyledCellLabelProvider(labelProvider);
 
 		treeViewer.setLabelProvider(delegatingStyled);
+		treeViewer.setData("REVERSE", Boolean.TRUE);
 		treeViewer.setComparator(new TimeZoneViewerComparator());
 
 		this.treeViewer = treeViewer;
@@ -199,18 +201,31 @@ public class TimeZoneTreeView extends ViewPart {
 	}
 
 	public class TimeZoneViewerComparator extends ViewerComparator {
+
 		public int compare(Viewer viewer, Object z1, Object z2) {
 
-			final boolean z1Instance = z1 instanceof ZoneId;
-			final boolean z2Instance = z2 instanceof ZoneId;
+			final Supplier<Integer> compareTo = () -> {
 
-			if (!z1Instance && !z2Instance)
-				return z1.toString().compareTo(z2.toString());
+				final boolean z1Instance = z1 instanceof ZoneId;
+				final boolean z2Instance = z2 instanceof ZoneId;
 
-			final Instant now = Instant.now();
-			final ZonedDateTime zdt1 = ZonedDateTime.ofInstant(now, (ZoneId) z1);
-			final ZonedDateTime zdt2 = ZonedDateTime.ofInstant(now, (ZoneId) z2);
-			return zdt1.compareTo(zdt2);
+				if (!z1Instance && !z2Instance)
+					return z1.toString().compareTo(z2.toString());
+
+				final Instant now = Instant.now();
+				final ZonedDateTime zdt1 = ZonedDateTime.ofInstant(now, (ZoneId) z1);
+				final ZonedDateTime zdt2 = ZonedDateTime.ofInstant(now, (ZoneId) z2);
+				return zdt1.compareTo(zdt2);
+			};
+
+			final int compare = compareTo.get();
+			final String data = String.valueOf(viewer.getData("REVERSE"));
+			final boolean reverse = Boolean.parseBoolean(data);
+
+			if (reverse) return -compare;
+			
+			return compare;
+
 		}
 	}
 
