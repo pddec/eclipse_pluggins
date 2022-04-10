@@ -1,10 +1,9 @@
 package com.ui.plugin.clock.views;
 
 import java.net.URL;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.util.Locale;
+import java.time.*;
+
 import java.time.format.TextStyle;
 import java.util.Collection;
 import java.util.Locale;
@@ -84,7 +83,6 @@ public class TimeZoneTreeView extends ViewPart {
 	@PostConstruct
 	public void create(Composite parent) {
 		final TreeViewer treeViewer = new TreeViewer(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.MULTI);
-
 		treeViewer.setContentProvider(new TimeZoneContentProvider());
 		treeViewer.setInput(new Object[] { TimeZoneView.getTimeZones() });
 
@@ -121,7 +119,7 @@ public class TimeZoneTreeView extends ViewPart {
 		final TimeZoneLabelProvider labelProvider = new TimeZoneLabelProvider(that.images, ir, fr);
 
 		return new DelegatingStyledCellLabelProvider(labelProvider);
-
+    
 	}
 
 	private static IDoubleClickListener doubleClickListener() {
@@ -157,7 +155,6 @@ public class TimeZoneTreeView extends ViewPart {
 		};
 
 	}
-
 	public static class TimeZoneDialog extends MessageDialog {
 		private ZoneId timeZone;
 
@@ -194,6 +191,7 @@ public class TimeZoneTreeView extends ViewPart {
 		}
 
 	}
+
 
 	public class TimeZoneContentProvider implements ITreeContentProvider {
 		@Override
@@ -336,7 +334,6 @@ public class TimeZoneTreeView extends ViewPart {
 
 		public boolean select(Viewer v, Object parent, Object element) {
 			final boolean zoneInstance = element instanceof ZoneId;
-
 			if (!zoneInstance)
 				return true;
 
@@ -344,7 +341,6 @@ public class TimeZoneTreeView extends ViewPart {
 			final Locale locale = Locale.getDefault();
 
 			final String displayName = zone.getDisplayName(TextStyle.FULL, locale);
-
 			return displayName.contains(this.pattern);
 
 		}
