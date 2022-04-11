@@ -23,10 +23,13 @@ import java.util.function.Supplier;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import javax.inject.Named;
+
 
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.Focus;
 
+import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.e4.ui.workbench.modeling.ESelectionService;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -126,7 +129,12 @@ public class TimeZoneTreeView extends ViewPart {
 	}
 
 	@Focus
-	public void focus() {}
+	public void focus() {
+
+		this.treeViewer.getControl().setFocus();
+	}
+	
+
 
 	private static DelegatingStyledCellLabelProvider delegatingStyled(final Composite parent,
 			final TimeZoneTreeView that) {
