@@ -5,16 +5,21 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.TextStyle;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.TimeZone;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+
+import javax.inject.Named;
+import org.eclipse.e4.ui.services.IServiceConstants;
 
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.workbench.modeling.ESelectionService;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
@@ -73,7 +78,6 @@ public class TimeZoneTableView extends ViewPart {
 		final Object[] array = ZoneId.getAvailableZoneIds().stream().map(ZoneId::of).toArray();
 
 		tableViewer.setInput(array);
-		
 
 		this.tableViewer = tableViewer;
 	}
@@ -85,6 +89,20 @@ public class TimeZoneTableView extends ViewPart {
 
 	@Override
 	public void setFocus() {
+	}
+	
+	public boolean hasTableViewer() {
+		return Objects.nonNull(this.tableViewer);
+	}
+
+	@Inject
+	@Optional
+	public void setTimeZone(@Named(IServiceConstants.ACTIVE_SELECTION) ZoneId timeZone) {
+		if (!Objects.nonNull(timeZone) && !this.hasTableViewer())
+			return;
+		this.tableViewer.setSelection(new StructuredSelection(timeZone));
+		this.tableViewer.reveal(timeZone);
+
 	}
 
 	public abstract class TimeZoneColumn extends ColumnLabelProvider {

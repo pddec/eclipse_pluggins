@@ -1,13 +1,15 @@
 package com.ui.plugin.clock.views;
 
 import java.net.URL;
-import java.util.Locale;
-import java.time.*;
-
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.format.TextStyle;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Supplier;
@@ -15,7 +17,9 @@ import java.util.function.Supplier;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.Focus;
+import org.eclipse.e4.ui.workbench.modeling.ESelectionService;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.FontRegistry;
@@ -29,6 +33,7 @@ import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelP
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IFontProvider;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -76,9 +81,18 @@ public class TimeZoneTreeView extends ViewPart {
 	@Inject
 	private ISharedImages images;
 
+	@Inject
+	@Optional
+	private ESelectionService selectionService;
+
 	@Override
 	public void createPartControl(Composite parent) {
 	}
+	
+	public boolean hasSelectionService() {
+		return Objects.nonNull(this.selectionService);
+	}
+
 
 	@PostConstruct
 	public void create(Composite parent) {
@@ -89,11 +103,13 @@ public class TimeZoneTreeView extends ViewPart {
 		treeViewer.setLabelProvider(TimeZoneTreeView.delegatingStyled(parent, this));
 		treeViewer.setData("REVERSE", Boolean.TRUE);
 		treeViewer.setComparator(new TimeZoneViewerComparator());
-		
+
 		treeViewer.setFilters(new ViewerFilter[] { new TimeZoneViewerFilter("GMT") });
 		treeViewer.setExpandPreCheckFilters(true);
 
 		treeViewer.addDoubleClickListener(TimeZoneTreeView.doubleClickListener());
+
+		treeViewer.addSelectionChangedListener(TimeZoneTreeView.selectionChangedListener(this));
 
 		this.treeViewer = treeViewer;
 	}
@@ -103,6 +119,8 @@ public class TimeZoneTreeView extends ViewPart {
 
 		this.treeViewer.getControl().setFocus();
 	}
+	
+
 
 	private static DelegatingStyledCellLabelProvider delegatingStyled(final Composite parent,
 			final TimeZoneTreeView that) {
@@ -119,9 +137,25 @@ public class TimeZoneTreeView extends ViewPart {
 		final TimeZoneLabelProvider labelProvider = new TimeZoneLabelProvider(that.images, ir, fr);
 
 		return new DelegatingStyledCellLabelProvider(labelProvider);
-    
-	}
 
+	}
+	
+	private static ISelectionChangedListener selectionChangedListener(final TimeZoneTreeView that) {
+
+		return event -> {
+			// forward selection
+			final Object selection = ((IStructuredSelection) event.getSelection())
+					.getFirstElement();
+			
+			final boolean nullableSelection = Objects.nonNull(selection);
+			
+			if (!nullableSelection && !that.hasSelectionService()) 
+				return;
+			
+			that.selectionService.setSelection(selection);
+		};
+	}
+	
 	private static IDoubleClickListener doubleClickListener() {
 
 		return event -> {
@@ -155,6 +189,7 @@ public class TimeZoneTreeView extends ViewPart {
 		};
 
 	}
+	
 	public static class TimeZoneDialog extends MessageDialog {
 		private ZoneId timeZone;
 
@@ -191,7 +226,6 @@ public class TimeZoneTreeView extends ViewPart {
 		}
 
 	}
-
 
 	public class TimeZoneContentProvider implements ITreeContentProvider {
 		@Override
@@ -334,6 +368,7 @@ public class TimeZoneTreeView extends ViewPart {
 
 		public boolean select(Viewer v, Object parent, Object element) {
 			final boolean zoneInstance = element instanceof ZoneId;
+
 			if (!zoneInstance)
 				return true;
 
@@ -341,6 +376,7 @@ public class TimeZoneTreeView extends ViewPart {
 			final Locale locale = Locale.getDefault();
 
 			final String displayName = zone.getDisplayName(TextStyle.FULL, locale);
+
 			return displayName.contains(this.pattern);
 
 		}
